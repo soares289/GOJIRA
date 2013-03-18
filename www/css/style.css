@@ -1,0 +1,172 @@
+@charset "UTF-8";
+
+
+.login .header,
+.login .footer{ display: none; }
+.login .body{ background: transparent !important; }
+
+
+
+div.index{ width: 100%; height: 400px; overflow-y: scroll; overflow-x: hidden; }
+
+.login .shade{ display: none; }
+div.login #logo{ margin-bottom: 30px; position: relative; }
+div.login div.loginForm{ position: relative; margin-top: -38px; }
+div.login div.loginForm label{ position: relative; line-height: 34px; text-align: right; width: 600px; float: right; text-transform: uppercase; }
+div.login div.loginForm input[type=text],
+div.login div.loginForm input[type=password]{ width: 248px; height: 22px; position: relative; background: #FDB913; }
+div.login div.loginForm input[type=submit]{ width: 22px; height: 22px; position: relative; float: right; background: url( ../images/bg_submit.gif); clear: both; margin-top: 5px; }
+
+
+div.body,
+.defbg{ background: url(../images/background/bg_main.png); }
+
+
+/* HEADER E MENU */
+div.header{ margin-top: 70px; position: relative; }
+
+div.header .logo{ position: absolute; left: 0px; bottom: 8px; }
+div.header .logo img{ width: 257px; }
+
+div.header div.menu{ position: relative; left: 262px; width: 845px; height: 43px; top: -2px; }
+div.header div.menu ul{ }
+div.header div.menu li{ position: relative; float: left; margin-left: 29px; line-height: 43px; }
+div.header div.menu li a{ color: #666666; font-size: 20px; text-transform: uppercase; }
+div.header div.menu li a:hover{ line-height: 40px; }
+
+
+div.header div.breadcrumb{ position: absolute; bottom: -20px; left: 0px; width: 100%; height: 20px; padding-left: 20px; }
+div.header div.breadcrumb *{ position: relative; float: left; color: #FFCA32; line-height: 20px; }
+
+
+
+/* CORPO E CONTEUDOS */
+div.body{ position: relative; width: 100%; min-height: 500px; height: auto; margin-top: 8px; border-radius: 13px; }
+div.body div.content{ margin: 0 10px; padding: 10px 0; }
+
+
+/* Menu interno padrao */
+/* MENU INTERNO PADRAO */
+.inner_menu{ position: relative; float: left; height: 35px; padding-top: 10px; }
+.inner_menu ul li{ position: relative; float: left; margin-right: 15px; }
+.inner_menu ul li a{ font-weight: bold; font-size: 16px; }
+.inner_menu ul li a:hover{ text-decoration: underline; }
+.inner_menu ul li.active a{ color: #000; }
+
+/* Caixa de botoes padrao */
+.options{ position: relative; float: right; height: 32px; margin-top: 5px; }
+.options a{ font-weight: bold; font-size: 14px;  }
+.options a img{ margin-bottom: -6px; }
+
+
+/* LIST - Lista padrao de registros */
+div.list{ padding: 20px 0; }
+div.list .icon{ margin-right: 4px; }
+div.list table{ width: 978px; }
+div.list table th,
+div.list table td{ padding: 4px 10px; vertical-align: middle; font-size: 11px; height: 30px; }
+div.list table th,
+div.list table th a{ font-weight: bold; white-space: nowrap; }
+div.list table th img{ height: 10px; width: 12px; }
+div.list table td:last-child{ white-space: nowrap; }
+div.list .buttonNew{ padding-right: 4px; }
+div.list table table{ width: 75% !important; margin-bottom: 10px; border-bottom: 4px solid #EEE; }
+
+div.pagination{ position: relative; float: left; padding: 10px 0; }
+div.pagination li{ position: relative; float: left; background-color: #000; margin: 5px 3px; border-radius: 8px;  }
+div.pagination li a{ color: #ccc; font-size: 15px; }
+div.pagination li strong{ color: #7AAF12; font-size: 15px; }
+div.pagination li a,
+div.pagination li strong{ padding: 10px; line-height: 30px; } 
+
+div.list2 .title, div.list .title{ position: relative; float: left; color: #000; font-size: 16px; font-weight: bold; }
+div.list div.buttonNew, div.list2 div.buttonNew{ position: relative; float: right; margin-right: 5px; margin-bottom: 15px;}
+div.list div.buttonNew a, div.list2 div.buttonNew a{ color: #ccc; }
+div.list div.buttonNew img, div.list2 div.buttonNew img{ margin-bottom: -10px; }
+
+
+
+
+/* List2 - Lista alternativa, com os thumbs das imagens */
+div.list2{ position: relative; width: 100%; overflow: hidden; }
+div.list2 ul{ position: relative; width: 100%; margin: 0px 0 0 5px;; }
+div.list2 ul li{ position: relative; float: left; width: 236px; height: 453px; background: #fff; margin: 0 9px 9px 0; }
+div.list2 ul li div{ color: #000; font-size: 12px; width: 100%; overflow: hidden; }
+div.list2 ul li div p{ padding: 0 10px; margin-bottom: 5px; }
+div.list2 ul li div strong{ font-weight: bold; }
+div.list2 ul li .icon{ margin-top: 4px; }
+div.list2 ul li .mediaImage{ position: relative; width: 218px; height: 204px; margin: 9px 0 0 9px; }
+div.list2 .buttonNew{ padding-right: 8px; }
+
+
+/* Lista para comentarios ou itens que precisam ter subniveis */
+div.comments{ width: 978px; }
+
+div.list3 div.buttons{ position: relative; float: right; }
+div.list3 div.buttons a{ margin-left: 15px; padding: 6px 15px; border-radius: 5px; }
+
+div.list3 ul.list3_list{ position: relative; width: 100%; float: right; }
+div.list3 ul.list3_list ul{ position: relative; width: 100%; background: url( ../images/bg_comment.png ) no-repeat 0px 0px; }
+div.list3 ul.list3_list ul,
+div.list3 ul.list3_list li{ position: relative; width: 97%; float: right; }
+div.list3 ul.list3_list li div{ background: #fff; margin-top: 15px; }
+div.list3 ul.list3_list li p,
+div.list3 ul.list3_list li span{ padding: 15px 0 15px 10px; margin: 0px; }
+div.list3 ul.list3_list li div.opts{ margin: 0px !Important; position: absolute; right: 10px; top: 28px; }
+
+div.list3 ul.list3_list .root{ width: 100% !important; }
+
+
+div.list3 *{ color: #000; }
+
+
+/* PARTE DE FORMULARIOS - Formularios padrao */
+#formEdit{ position: relative; width: 978px; padding-top: 15px; }
+#formEdit textarea{ min-height: 80px; padding: 5px; }
+#formEdit .sizefull{ width: 940px; height: 24px; }
+#formEdit .sizedouble{ width: 705px; height: 24px; padding: 0px; }
+#formEdit .sizehalf{ width: 471px; height: 24px; }
+#formEdit .sizesmall{ width: 345px; height: 24px; }
+#formEdit .sizetiny{ width: 135px; height: 24px; }
+
+#formEdit label{ position: relative; float: left; margin: 0 15px 15px 0; min-height: 30px; color: #000; font-size: 12px; }
+#formEdit label.auto{ height: auto !important; }
+#formEdit label object{ margin-bottom: -10px; margin-left: 20px; }
+#formEdit label .uploadifyQueueItem{ margin-top: 20px; }
+#formEdit input[type=submit]{ padding: 10px 30px; color: #fff; background-color: #000; margin-right: 15px; font-weight: bold; }
+#formEdit input[type=submit]:hover{ background-color: #444; }
+
+#formEdit label .linkButton{ text-decoration: underline; color: #000; font-size: 15px; }
+#formEdit .button_add{ width: 24px; height: 24px; border: none; background: url( ../images/icons/add.png ); margin-left: 5px; }
+
+#formEdit .addNewForm input[type="text"]{ width: 200px; height: 20px; margin-right: 10px; }
+#formEdit .addNewForm input[type="button"]{ width: 100px; height: 20px; margin-left: 10px; }
+#formEdit .asmListItem{ background-color: #fff; border: 1px solid #FDB913; }
+#formEdit .asmListItem a{ color: #000; }
+
+#formEdit .images{ position: relative; width: 100%; height: auto; }
+#formEdit .images ul li{ position: relative; float: left; width: 250px; height: 300px; margin: 0 25px 15px 0; }
+
+.content .profile{ position: absolute; right: 15px; top: 25px; width: 256px; height: 356px; z-index: 10; }
+.content .profile label{ position: absolute; top: 312px; width: 100%; text-align: right; line-height: 20px; }
+.content .profile object{ position: relative; top: 10px; }
+
+.content img{ max-width: 940px; }
+
+.asmHighlight{ display: none !important; }
+
+.reply_box{ position: absolute; top: 15px; right: 0px; width: 600px; height: 300px; text-align: center; padding: 10px 0; background: #000 !important; z-index: 5; }
+.reply_box p{ position: relative; text-align: left; color: #fff; padding: 0 0 8px 27px !important; }
+.reply_box textarea{ position: relative; width: 90%; height: 230px; color: #000; }
+.reply_box input[type="button"]{ width: 100px; height: 30px; margin: 10px 15px; color: #000; }
+
+
+
+.image_list{ position: relative; width: 100%; height: auto; }
+.image_list .image_list_item{ position: relative; float: left; }
+.image_list .image_list_item .button{ position: absolute; top: 5px; left: 5px; }
+
+
+
+/* Parte rentalcam */
+table.subcat{ float: right;  }

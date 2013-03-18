@@ -1,0 +1,19 @@
+@charset "UTF-8";
+/* CSS Document */
+
+
+.login .header,
+.login .footer{ display: none; }
+.login .body{ background: transparent !important; }
+
+
+div.login *{ font-family: Verdana, Geneva, sans-serif; }
+div.login{ position: relative; margin: 15% auto; width: 500px; }
+div.login .form{ text-align: right; margin: 0 auto; width: 300px; padding-top: 30px; }
+div.login .form label{ font-size: 24px; color: #fff; position: relative; height: 30px; text-align: right; }
+div.login .form .inputText{ height: 25px; font-size: 16px; width: 200px; }
+div.login .form .loginSubmit{ position: relative; margin-top: 10px; padding: 5px; background: #fff; }
+div.login .privacity{ color: #fff; margin-top: 25px; text-align: left; }
+
+.errMsg{ position: relative; width: 100%; text-align: center; font-size: 22px; color: #b99; }
+

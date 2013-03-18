@@ -1,0 +1,80 @@
+@charset "UTF-8";
+
+/**************** RESETS ********************/
+*{ font-size: 12px; font-family: Verdana, Geneva, sans-serif; text-decoration: none; }
+
+*, html, body, div, span, applet, object, iframe, table, caption,
+tbody, tfoot, thead, tr, th, td, del, dfn, em, font, img, ins,
+kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr,
+acronym, address, big, cite, code, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend {
+    vertical-align: baseline;
+    outline: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+:focus { outline: 0; }
+a img, :link img, :visited img { border: none; }
+
+body { font-size: 11px; }
+ol, ul { list-style: none; }
+table { border-collapse: separate; border-spacing: 0; }
+caption, th, td { font-weight: normal; text-align: left; }
+p{ margin-bottom: 10px; }
+
+.clear, .wrapper{ position: relative; width: 1px; height: 1px; clear: both; }
+.oculto, .hidden{ display: none; }
+
+.imgLeft{ margin: 0 10px 10px 0; float: left; }
+.imgRight{ margin: 0 0 10px 10px; float: right; }
+/*************************************************/
+
+
+body{ background: #666; }
+div.main{ position: relative; text-align: left; padding-top: 40px; width: 1000px; margin: 0 auto; }
+
+img.icon{ width: 22px; }
+
+
+
+/* Estrutura basica do site */
+.bg_main,
+.bg_shade,
+.bg_fade_left,
+.bg_fade_right,
+.bg_texture{ position: relative; width: 100%; height: 100%; }
+
+body{ background: url( ../../images/bg.jpg ); }
+/*
+.bg_shade{      background: url( ../images/background/bg.png ) repeat center center; position: absolute; }
+.bg_main{       background: url( ../images/background/bg.jpg ) no-repeat center center; position: fixed; }
+.bg_fade_left{  background: url( ../images/background/left.png ) repeat-y left top; position: absolute; }
+.bg_fade_right{ background: url( ../images/background/right.png ) repeat-y right top; }
+.bg_texture{    background: url( ../images/background/texture.png ) repeat; position: fixed; overflow: auto; }
+*/
+
+.text-right{ text-align: right; }
+.text-left{ text-align: left; }
+
+
+/* CORES PADRÕES DO SISTEMA */
+   /* SUBMENUS */
+   .inner_menu *{ color: #666; }                   /* COR DO TEXTO PADRAO */
+   .inner_menu ul li a.active,
+   .options a{ color: #000; }       /* COR DO TEXTO DIFERENCIADO */
+   
+   /* LISTAS */
+   div.list table td{ background: #fff; color: #000; }
+   div.list table th{ background: #666; }
+   div.list table tr.alter td{ background-color: #eee; }
+   div.list table th,
+   div.list table th a{ color: #fff; }
+   div.list table th,
+   div.list table td{ border: 0px solid #FDB913; }
+
+input[type="text"],
+input[type="password"],
+textarea{ background: #e5e5e5; border: 1px solid #aaa; }

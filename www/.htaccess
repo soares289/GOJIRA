@@ -1,0 +1,12 @@
+RewriteEngine On
+
+RewriteBase /dropbox/projetos/web/carlson/control/codigo/www/
+
+RewriteRule ^system/(.*) system/$1 [L]
+RewriteRule ^images/(.*) images/$1 [L]
+RewriteRule ^js/(.*)  js/$1 [L]
+RewriteRule ^css/(.*) css/$1 [L]
+RewriteRule ^swf/(.*) swf/$1 [L]
+
+RewriteRule ^(.*)/(.*) engine.php?query=$1/$2 [L]
+RewriteRule ^ engine.php [L]
