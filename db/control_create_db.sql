@@ -1,7 +1,4 @@
-﻿DROP DATABASE IF EXISTS `control`;
-CREATE DATABASE `control` DEFAULT CHARSET=utf8;
-USE `control`;
-
+﻿
 
 #tipos de usuários - Vincular ao indice de acessos
 CREATE TABLE `user_type`(
