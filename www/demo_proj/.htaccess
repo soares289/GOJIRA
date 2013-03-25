@@ -1,6 +1,6 @@
 RewriteEngine On
 
-RewriteBase /dropbox/projetos/web/carlson/control/codigo/www/
+RewriteBase /dropbox/projetos/web/carlson/GOJIRA/www/demo_proj/
 
 RewriteRule ^system/(.*) system/$1 [L]
 RewriteRule ^images/(.*) images/$1 [L]

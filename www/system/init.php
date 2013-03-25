@@ -25,6 +25,6 @@
       $globals->tools    = new Tool();
       $globals->conn     = new Connection( $globals->db->host, $globals->db->user, $globals->db->password, $globals->db->name);
       $globals->cfg      = new Config( $globals->conn, $globals->tools );
+      $globals->smarty   = new Smarty();
       $globals->log      = new Log( $globals->conn, $globals->tools );
       $globals->login    = new Login( $globals->conn, $globals->tools );
-      $globals->smarty   = new Smarty();      
