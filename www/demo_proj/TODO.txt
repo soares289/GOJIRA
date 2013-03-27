@@ -1,0 +1,9 @@
+OK -- Criar estrutura base para o projeto
+OK -- Montar estrutura base do HTML
+
+Configurar o sistema
+Criar base de dados
+Configurar conexão com o banco de dados
+Montar login
+Montar tela de cadastro
+Montar tela de Listar usuarios
