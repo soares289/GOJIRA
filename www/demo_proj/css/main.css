@@ -33,7 +33,19 @@ p{ margin-bottom: 10px; }
 /*************************************************/
 
 
-body{ background: #666; }
+html, button, input, select, textarea { 
+   color: #222;
+   font-family: 'Open Sans', sans-serif;
+}
+
+body, html {
+   height: 100%;
+   font-size: 1em;
+   line-height: 1.4;
+   font-family: 'Open Sans', sans-serif;
+}
+
+
 div.main{ position: relative; text-align: left; padding-top: 40px; width: 1000px; margin: 0 auto; }
 
 img.icon{ width: 22px; }
@@ -56,25 +68,3 @@ body{ background: url( ../../images/bg.jpg ); }
 .bg_texture{    background: url( ../images/background/texture.png ) repeat; position: fixed; overflow: auto; }
 */
 
-.text-right{ text-align: right; }
-.text-left{ text-align: left; }
-
-
-/* CORES PADRÕES DO SISTEMA */
-   /* SUBMENUS */
-   .inner_menu *{ color: #666; }                   /* COR DO TEXTO PADRAO */
-   .inner_menu ul li a.active,
-   .options a{ color: #000; }       /* COR DO TEXTO DIFERENCIADO */
-   
-   /* LISTAS */
-   div.list table td{ background: #fff; color: #000; }
-   div.list table th{ background: #666; }
-   div.list table tr.alter td{ background-color: #eee; }
-   div.list table th,
-   div.list table th a{ color: #fff; }
-   div.list table th,
-   div.list table td{ border: 0px solid #FDB913; }
-
-input[type="text"],
-input[type="password"],
-textarea{ background: #e5e5e5; border: 1px solid #aaa; }

@@ -41,3 +41,18 @@ blockquote:before, blockquote:after, q:before, q:after {
 blockquote, q {
     quotes: "" "";
 }
+
+textarea {
+    resize: vertical;
+}
+
+/* ==========================================================================
+   Chrome Frame prompt
+   ========================================================================== */
+
+.chromeframe {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
