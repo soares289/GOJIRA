@@ -8,8 +8,10 @@
             
 				<div class="main">
    				<div class="header">
-			      	<div class="logo"><a href="./"><img src="{$environment->site_url}images/logo.png" alt=""></a></div>
                   {if $environment->logged}
+                     <div class="logo">
+                        <a href="{$environment->site_url}"><img src="{$environment->site_url}images/logo.png" alt=""></a>
+                     </div>
 							{include file="menu.tpl"}
                   {/if}
 			         <div class="breadcrumb">
