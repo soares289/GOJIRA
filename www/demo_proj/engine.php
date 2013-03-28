@@ -13,6 +13,7 @@
 		$ajax  = true;
 		$class = $_POST['class'];
 		$proc  = ( isset($_POST['proc']) ? $_POST['proc'] : '');
+      $param = array();
 		
 	} else {
 		
@@ -45,14 +46,14 @@
 	try{
 		
       //Inicia o controller e busca o seu retorno
-		if( $ajax ) $param = $_POST;
+		$param = array_merge( $param, $_POST ):
 		$objData = Controller::Call( $class, $proc, $globals, $param );
 		
       //Retorna o view
 		if( isset( $objData->view_file ) ){
 			$file = $objData->view_file . '.tpl';
 		} else {
-   			$file = $class . '/' . $proc . '.tpl';
+   		$file = $class . '/' . $proc . '.tpl';
 		}
 		
       //Passa as variaveis para o template

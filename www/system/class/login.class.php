@@ -8,6 +8,9 @@ define( 'LGN_DEFAULT_TABLE' , 'user' );
 define( 'LGN_DEFAULT_PREFIX', 'usr' );
 define( 'LGN_USE_EMAIL'     , true );
 
+//TODO - Permitir USAR ou NÃO USAR USER_TYPE
+//TODO - Permitir configurar a tabela para o USER_TYPE
+//TODO - Colocar o codigo do erro em constantes também
 
 	require_once( "properties.class.php" );
 	require_once( "log.class.php" );
@@ -424,7 +427,7 @@ define( 'LGN_USE_EMAIL'     , true );
 				
 				$cryptPass 	= $this->toPassword($pass);
 				$sql  = "UPDATE " . $this->table . " SET " . $this->prefix . "pwd = '" . $cryptPass . "' WHERE " . $this->prefix . "cod = " . $userId . " LIMIT 1";
-				return($this->conn->query($sql));
+				return ($this->conn->query($sql));
 				
 			}
 			
