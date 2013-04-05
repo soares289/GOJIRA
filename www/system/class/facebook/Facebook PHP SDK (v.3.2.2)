@@ -1,0 +1,37 @@
+<?php
+   //Facebook PHP SDK (v.3.2.2)
+
+   //Usage
+   //The examples are a good place to start. The minimal you'll need to have is:
+
+   require 'facebook-php-sdk/src/facebook.php';
+
+   $facebook = new Facebook(array(
+     'appId'  => 'YOUR_APP_ID',
+     'secret' => 'YOUR_APP_SECRET',
+   ));
+
+   // Get User ID
+   $user = $facebook->getUser();
+   
+   
+   //To make API calls:
+
+   if ($user) {
+     try {
+       // Proceed knowing you have a logged in user who's authenticated.
+       $user_profile = $facebook->api('/me');
+     } catch (FacebookApiException $e) {
+       error_log($e);
+       $user = null;
+     }
+   }
+   
+
+   //Login or logout url will be needed depending on current user state.
+
+   if ($user) {
+     $logoutUrl = $facebook->getLogoutUrl();
+   } else {
+     $loginUrl = $facebook->getLoginUrl();
+   }

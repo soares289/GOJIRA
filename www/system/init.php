@@ -17,8 +17,7 @@
       require_once( "class/collection.class.php" );
       require_once( "class/smarty/Smarty.class.php" );
       require_once( "class/paypal.class.php" );
-      require_once( "class/phpmailer.class.php" );
-	
+      
 //Seta as globais
 
       //Objetos mais comumente usados

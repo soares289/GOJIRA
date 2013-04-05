@@ -5,7 +5,9 @@
 	arquivo, na subpasta tool.
 	Carregada para dentro dessa classe automaticamente.
 */
-		
+
+      //Classe de email PHPMailer usada pelo tools/network.class.php
+      require_once( dirname( __FILE__ ) . '/phpmailer/class.phpmailer.php' );
 		
 		class Tool{
 			

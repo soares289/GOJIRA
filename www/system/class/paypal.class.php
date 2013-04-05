@@ -81,11 +81,8 @@ if (strcmp ($res, "VERIFIED") == 0) {
 ?>
 
    */
-   
-$tmpPath  = str_replace( "\\", "/", __FILE__ );
-$tmpPathA = explode( "/", $tmpPath );
-$tmpPath  = substr( $tmpPath, 0, strlen( $tmpPath ) - strlen( end( $tmpPathA ) ) );
-set_include_path( $tmpPath . 'paypal' );
+
+set_include_path( dirname(__FILE__) . '/paypal/' );
 	
 require_once( 'services/PayPalApi/PayPalAPIInterfaceServiceService.php' );
 require_once( 'PPLoggingManager.php' );
