@@ -9,9 +9,6 @@
    </div>
    
    
-   <div class="privacity">
-      Esta mensagem é falso podem conter informacoes confidenciais e ou legalmente protegidas. Caso tenha recebido por engano, favor devolve-la ao remetente e elimina-la do seu sistema, nao divulgando ou utilizando a totalidade ou parte desta mensagem.
-   </div>
 </div>
 <script type="text/javascript">
 	$(function(){

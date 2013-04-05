@@ -47,8 +47,8 @@ define( 'SYSDIR_NAME', '../system/');
    } else {
                
       error_reporting( E_ALL );
-      $globals->db->name     = "control";
-      $globals->db->host     = "localhost";
+      $globals->db->name     = "gojira";
+      $globals->db->host     = "192.168.0.101";
       $globals->db->user     = "user";
       $globals->db->password = "user$";
    }
