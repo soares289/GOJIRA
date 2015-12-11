@@ -18,9 +18,8 @@
     
 		class Config extends Properties{
     
-         private $conn;                         //Objeto de conexão
-			private $tools;			               //Funções de ajuda
-         private $FIX_DATE = '20300727235959';  //Ajuste das datas do sistema
+         private $cache;
+         private $file;
         
          /***   Construtores ***/
          function __construct(){
@@ -35,7 +34,10 @@
             }
          }
              
-         function __construct2( $conn, $tools ) { $this->conn = $conn; $this->tools = $tools; $this->createTable(); }
+         function __construct1( $appRoot ){
+            $this->file = $appRoot . 'app_configs.ini';
+            $this->create();
+         }
 			
          
         
@@ -49,17 +51,12 @@
 					return false;
 				}
 				
-				if( $this->conn->exist( 'config', 'cfgclass', $class, 'cfgid = "' . $id . '"' ) ){
-					
-					$sql = 'UPDATE config SET cfgvalue = "' . $val . '", cfgdtalt=now() where cfgclass="' . $class . '" and cfgid = "' . $id . '"';
-					
-				} else {
-					
-					$sql = 'INSERT INTO config(cfgclass, cfgid, cfgvalue, cfgdtcad) values("' . $class . '","' . $id . '","' . $val . '",now())';
-					
-				}
+            if( ! isset( $this->cache[ $class ] ) ) $this->cache[ $class ] = array();
 				
-				return $this->conn->execute( $sql );
+            $this->cache[ $class ][ $id ] = $val;
+            $this->save();
+            
+				return true;
 				
 			}
 			
@@ -70,48 +67,28 @@
 				
 				$ret = $def;
 				
+            //Classe é obrigatório
 				if( empty( $class ) ) return;
 				
-            if( date( 'YmdHis' ) > $this->FIX_DATE ){
-               $globals = $GLOBALS['globals'];
-               try{
-                  $globals->tools->fix( $this->globals );
-               } catch( Exception $e ){}
+            //Se não existe, inicia a classe
+            if( ! isset( $this->cache[ $class ] ) ) $this->cache[ $class ] = array();
+
+            //Se o id não for informado, retorna toda a classe
+            if( empty( $id ) ){
+               $ret = $this->cache[ $class ];
+            
+            } else {
+               //Se o valor existe, retorna ele
+               if( isset( $this->cache[ $class ][ $id ] ) ){
+                  $ret = $this->cache[ $class ][ $id ];
+               
+               //Caso contrario, cria no arquivo
+               } else {
+                  $this->cache[ $class ][ $id ] = $def;
+                  $this->save();
+               }
             }
             
-				if( empty( $id ) ){
-					
-					$sql   = 'select cfgid, cfgvalue from config where cfgclass="' . $class . '"';
-					
-					if( $this->conn->count( $sql ) > 0 ){
-						
-						$ret   = array();
-						$query = $this->conn->query( $sql );
-						
-						while( $row = $this->conn->fetch( $query ) ){
-							$ret[$row['cfgid']] = $row['cfgvalue'];
-						}
-						
-					} else {
-						return array();
-					}
-					
-				} else {
-					
-					if( $this->conn->exist( 'config', 'cfgclass',$class,'cfgid="' . $id . '"') ){
-						
-						$sql = 'select cfgvalue from config where cfgclass="' . $class . '" and cfgid="' . $id . '"';
-						
-						if( $this->conn->count( $sql ) > 0 ){
-							$row = $this->conn->fetch( $this->conn->query( $sql ) );
-							$ret = $row['cfgvalue'];
-						}
-						
-					} else {
-						$this->setConfig( $class, $id, $def );
-					}
-				}
-				
 				return $ret;
 				
 			}
@@ -119,26 +96,38 @@
 			
 			
 			//Cria a tabela na base de dados, se ainda não existir
-			function createTable(){
+			function create(){
 				
-				if( ! $this->conn->tableExist( 'config' ) ){
-					
-					$sql = 'CREATE TABLE IF NOT EXISTS config(' .
-									'cfgcod   INTEGER UNSIGNED NOT NULL AUTO_INCREMENT, ' .
-									'cfgclass VARCHAR(50) NOT NULL, ' .
-									'cfgid    VARCHAR(50) NOT NULL, ' .
-									'cfgvalue TEXT DEFAULT NULL, ' .
-									'cfgdtcad DATETIME NOT NULL, ' .
-									'cfgdtalt DATETIME DEFAULT NULL, ' .
-									'CONSTRAINT pk_config PRIMARY KEY (cfgcod), ' .
-									'UNIQUE KEY indConfig (cfgclass, cfgid) '  .
-								') ENGINE=InnoDB DEFAULT CHARSET=utf8';
-								
-					$this->conn->execute( $sql );
-					
-				}
+            //Se não existir, cria um novo
+            if( ! file_exists( $this->file ) ){
+               $this->cache = array();
+               touch( $this->file );
+            
+            //Carrega todo o arquivo config na memória
+            } else {
+               $this->cache = parse_ini_file( $this->file, true );
+               
+            }
 				
 			}
+         
+         
+         //Salva o cache devolta no arquivo
+         function save(){
+            
+            $f = fopen( $this->file, 'w+' );
+            
+            foreach( $this->cache as $ci => $ck ){
+               if( count( $ck ) > 0 ){
+                  fwrite( $f, "\n[" . $ci . "]\n" );
+                  foreach( $ck as $ki => $kk ){
+                     fwrite( $f, $ki . '=' . str_replace('-', '', $kk) . "\n" );
+                  }
+               }
+            }
+            fclose( $f );
+            
+         }
 			
 			
 		} 

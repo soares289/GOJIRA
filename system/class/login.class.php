@@ -125,13 +125,13 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 				
 				//Salva a sessão
             if( $this->useCookie ){
-               setcookie( $row['type'] . "Logged" , true, time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( $row['type'] . "Cod"    , $row['code'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( $row['type'] . "Login"  , $row['login'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( $row['type'] . "Email"  , $row['email'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( $row['type'] . "Name"   , $row['name'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( $row['type'] . "Type"   , $row['type'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( $row['type'] . "Typecod", $row['type_cod'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "logged" , true, time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "cod"    , $row['code'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "login"  , $row['login'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "email"  , $row['email'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "name"   , $row['name'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "type"   , $row['type'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "typecod", $row['type_cod'], time() + LGN_COOKIE_EXPIRE_TIME);
                
             } else {
                $_SESSION[ $row['type'] . "Logged"]  = true;
@@ -157,43 +157,37 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 			function logoff( $type ){
 
 				if( $this->isLogged( $type ) ){
-					
+
 					//Loga a saida do sistema
 					$usr = $this->getLogged( 'Cod', $type );
 					$log = new Log( $this->conn, $this->tools );
 					$log->add("LOGIN","LOGOFF","user",$usr,$usr,'Saindo do sistema');
 					
-					$type = $this->getType( $type, true );
-					$type = explode( ',', strtoupper( $type ) );
-					
+					$type   = $this->getType( $type, true );
+					$type   = explode( ',', strtoupper( $type ) );
+               $fields = array('Logged', 'Cod', 'Name', 'Login', 'Email', 'Type', 'Typecod');
 					//Desloga todos os tipos de usuários informados
 					foreach( $type as $a ){
 						
                   if( $this->useCookie ){
                      
-                     unset( $_COOKIE[ $a . 'Logged'] );  setcookie($a . 'Logged', '', time()-3600, '/');
-                     unset( $_COOKIE[ $a . 'Cod'] );     setcookie($a . 'Cod', '', time()-3600, '/');
-                     unset( $_COOKIE[ $a . 'Name'] );    setcookie($a . 'Name', '', time()-3600, '/');
-                     unset( $_COOKIE[ $a . 'Login'] );   setcookie($a . 'Login', '', time()-3600, '/');
-                     unset( $_COOKIE[ $a . 'Email'] );   setcookie($a . 'Email', '', time()-3600, '/');
-                     unset( $_COOKIE[ $a . 'Type'] );    setcookie($a . 'Type', '', time()-3600, '/');
-                     unset( $_COOKIE[ $a . 'Typecod'] ); setcookie($a . 'Typecod', '', time()-3600, '/');
+                     foreach( $fields as $fld ){
+                        echo strtolower($a . $fld);
+                        setcookie(strtolower($a . $fld), 0, 2);
+                        unset( $_COOKIE[ strtolower($a . $fld)] );
+                     }
                      
                      //Para os sistemas que criam outras váriaveis de sessão para o usuário e não limpão manualmente no logoff
                      foreach( $_COOKIE as $i => $v ){
-                        if( substr( $i, 0, strlen( $a ) ) === $a ){
+                        if( substr( $i, 0, strlen( $a ) ) === strtolower($a) ){
+                           setcookie($i, 0, -60, '/');
                            unset($_COOKIE[ $i ]);
-                           setcookie($i, '', time()-3600, '/');
                         }
                      }
                   } else {
-                     unset( $_SESSION[ $a . 'Logged'] );
-                     unset( $_SESSION[ $a . 'Cod'] );
-                     unset( $_SESSION[ $a . 'Name'] );
-                     unset( $_SESSION[ $a . 'Login'] );
-                     unset( $_SESSION[ $a . 'Email'] );
-                     unset( $_SESSION[ $a . 'Type'] );
-                     unset( $_SESSION[ $a . 'Typecod'] );
+                     foreach( $fields as $fld ){
+                        unset( $_SESSION[ $a . $fld] );
+                     }
                      
                      //Para os sistemas que criam outras váriaveis de sessão para o usuário e não limpão manualmente no logoff
                      foreach( $_SESSION as $i => $v ){
@@ -270,9 +264,9 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 				
 				foreach( $type as $a ){
                if( $this->useCookie ){
-                  if( isset( $_COOKIE[ strtoupper( $a ) . $field ] ) &&
-                     !empty( $_COOKIE[ strtoupper( $a ) . $field ] ) ){
-                     return $_COOKIE[ strtoupper( $a ) . $field ];
+                  if( isset( $_COOKIE[ strtolower( $a  . $field ) ] ) &&
+                     !empty( $_COOKIE[ strtolower( $a  . $field ) ] ) ){
+                     return $_COOKIE[ strtolower( $a  . $field )];
                   }
                } else {
                   if( isset( $_SESSION[ strtoupper( $a ) . $field ] ) &&
@@ -294,21 +288,21 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 				
 				foreach( $type as $a ){
                if( $this->useCookie ){
-                  setcookie('Hello', null, -1, '/');
-                  if( isset( $_COOKIE[ $a . 'Logged'] ) &&
-                      isset( $_COOKIE[ $a . 'Cod'] ) &&
-                      isset( $_COOKIE[ $a . 'Name'] ) &&
-                      isset( $_COOKIE[ $a . 'Login'] ) &&
-                      isset( $_COOKIE[ $a . 'Email'] ) ){
+                  $a = strtolower( $a );
+                  if( isset( $_COOKIE[ $a . 'logged'] ) &&
+                      isset( $_COOKIE[ $a . 'cod'] ) &&
+                      isset( $_COOKIE[ $a . 'name'] ) &&
+                      isset( $_COOKIE[ $a . 'login'] ) &&
+                      isset( $_COOKIE[ $a . 'email'] ) ){
 
-                     if( $_COOKIE[ $a . 'Logged'] == true &&
-                        !empty( $_COOKIE[ $a . 'Cod'] ) &&
-                        !empty( $_COOKIE[ $a . 'Login'] ) &&
-                        !empty( $_COOKIE[ $a . 'Email'] ) ){
+                     if( $_COOKIE[ $a . 'logged'] == true &&
+                        !empty( $_COOKIE[ $a . 'cod'] ) &&
+                        !empty( $_COOKIE[ $a . 'login'] ) &&
+                        !empty( $_COOKIE[ $a . 'email'] ) ){
                            
                         $typeCod = $this->getType( $a );
 
-                        if( $this->conn->exist( $this->table, $this->prefix . 'cod', $_COOKIE[ $a . 'Cod'], "typecod in " . $typeCod . ' and ' . $this->prefix . 'active' ) ){
+                        if( $this->conn->exist( $this->table, $this->prefix . 'cod', $_COOKIE[ $a . 'cod'], "typecod in " . $typeCod . ' and ' . $this->prefix . 'active' ) ){
                            $n++;
                         }
                      }

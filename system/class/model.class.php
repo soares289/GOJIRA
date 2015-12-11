@@ -62,10 +62,10 @@
 			
 			
 			//Invoca o modelo correto
-			static function Call( $class, $globals ){
+			static function Load( $class, $globals ){
 				
 				$file    = strtolower( $class ) . '.php';
-				$dir     = $globals->environment->dir_model;
+				$dir     = $globals->environment->modelPath;
 				$class   = ucfirst($class) . '_Model';
 				
 				//Se localizar o arquivo no disco
@@ -78,7 +78,7 @@
 				} else {
 					
 					//Model não localizado no disco
-					//throw( new ModelException( "Model <strong>\"" . $class . "\"</strong> not found in <strong>\"" . $dir . $file . "\"</strong>", 0x2001 ) );
+					throw( new ModelException( "Model <strong>\"" . $class . "\"</strong> not found in <strong>\"" . $dir . $file . "\"</strong>", 0x2001 ) );
 					
 				}
 				

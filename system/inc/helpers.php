@@ -1,5 +1,5 @@
 <?php
-/* Quando uma classe de auxilio for estanciada, verifica se ela está em uma dessas pastas, então da include na mesma
+/* Quando uma classe de auxilio for instanciada, verifica se ela está em uma dessas pastas, então da include na mesma
    ps: Só funciona em PHP5 ou superior;
 */
 
@@ -24,17 +24,17 @@
          
       
       //Busca dentro da pasta Helpers do projeto
-      } elseif( file_exists( $globals->environment->absPath . 'helpers/' . $className . '.php' ) ){
-         require_once($globals->environment->absPath . 'helpers/' . $className . '.php');
+      } elseif( file_exists( $globals->environment->absPath . 'core/helpers/' . $className . '.php' ) ){
+         require_once($globals->environment->absPath . 'core/helpers/' . $className . '.php');
       
       //Busca dentro da pasta class do projeto      
-      } elseif( file_exists( $globals->environment->absPath . 'class/' . $className . '.php' ) ){
-         require_once($globals->environment->absPath . 'class/' . $className . '.php');
+      } elseif( file_exists( $globals->environment->absPath . 'core/class/' . $className . '.php' ) ){
+         require_once($globals->environment->absPath . 'core/class/' . $className . '.php');
       
       
       //Busca dentro da pasta inc do projeto      
-      } elseif( file_exists( $globals->environment->absPath . 'inc/' . $className . '.php' ) ){
-         require_once($globals->environment->absPath . 'inc/' . $className . '.php');
+      } elseif( file_exists( $globals->environment->absPath . 'core/inc/' . $className . '.php' ) ){
+         require_once($globals->environment->absPath . 'core/inc/' . $className . '.php');
       }
       
    }

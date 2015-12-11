@@ -1,0 +1,10 @@
+RewriteEngine On
+
+RewriteBase /GOJIRA/project_demo/
+
+RewriteRule ^server/(.*) server/$1 [L]
+RewriteRule ^system/(.*) system/$1 [L]
+RewriteRule ^webroot/(.*) webroot/$1 [L]
+
+RewriteRule ^(.*)/(.*) engine.php?query=$1/$2 [L]
+RewriteRule ^ engine.php [L]
