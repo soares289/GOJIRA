@@ -4,37 +4,31 @@
 */
 
    //Trabalha com os helpers
-   function helper_loader($className) {
+   function helper_loader($className, $lRec = false) {
       
-      $globals   = $GLOBALS['globals'];
-      $className = strtolower( $className );
+      $env       = $GLOBALS['globals']->environment;
+      $className = str_replace( "\\","/", $className );
       
-      
-      //Procura dentro da pasta Helpers do sistema
-      if( file_exists( $globals->environment->systemPath . 'helpers/' . $className . '.php' ) ){
-         require_once($globals->environment->systemPath . 'helpers/' . $className . '.php');
-      
-      //Procura dentro da pasta Class do sistema
-      } elseif( file_exists( $globals->environment->systemPath . 'class/' . $className . '.php' ) ){
-         require_once($globals->environment->systemPath . 'class/' . $className . '.php');
+      if( file_exists( $env->vendorPath . $className . '.php' ) ){
+         require_once( $env->vendorPath . $className . '.php' );
          
-      //Procura dentro da pasta INC do sistema
-      } elseif( file_exists( $globals->environment->systemPath . 'inc/' . $className . '.php' ) ){
-         require_once($globals->environment->systemPath . 'inc/' . $className . '.php');
+      } elseif( file_exists( $env->libPath . $className . '.php' ) ){
+         require_once( $env->libPath . $className . '.php' );
          
-      
-      //Busca dentro da pasta Helpers do projeto
-      } elseif( file_exists( $globals->environment->absPath . 'core/helpers/' . $className . '.php' ) ){
-         require_once($globals->environment->absPath . 'core/helpers/' . $className . '.php');
-      
-      //Busca dentro da pasta class do projeto      
-      } elseif( file_exists( $globals->environment->absPath . 'core/class/' . $className . '.php' ) ){
-         require_once($globals->environment->absPath . 'core/class/' . $className . '.php');
-      
-      
-      //Busca dentro da pasta inc do projeto      
-      } elseif( file_exists( $globals->environment->absPath . 'core/inc/' . $className . '.php' ) ){
-         require_once($globals->environment->absPath . 'core/inc/' . $className . '.php');
+      } elseif( file_exists( $env->includePath . $className . '.php' ) ){
+         require_once( $env->includePath . $className . '.php' );
+         
+      } elseif( file_exists( $env->systemLibPath . $className . '.php' ) ){
+         require_once( $env->systemLibPath . $className . '.php' );
+         
+      } elseif( file_exists( $env->systemIncPath . $className . '.php' ) ){
+         require_once( $env->systemIncPath . $className . '.php' );
+         
+      } elseif( file_exists( $env->systemPluginPath . $className . '.php' ) ){
+         require_once( $env->systemPluginPath . $className . '.php' );
+         
+      } elseif( ! $lRec ){
+         helper_loader( strtolower( $className ), true );
       }
       
    }

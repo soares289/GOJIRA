@@ -68,8 +68,8 @@
       $globals->environment->controllerPath   = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'CONTROLLER_DIR', $globals->environment->absPath . 'core/controller/');
       $globals->environment->modelPath        = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'MODEL_DIR'     , $globals->environment->absPath . 'core/model/');
       $globals->environment->includePath      = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'INCLUDE_DIR'   , $globals->environment->absPath . 'core/inc/');
-      $globals->environment->vendorPath       = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'INCLUDE_DIR'   , $globals->environment->absPath . 'core/vendor/');
-      $globals->environment->libPath          = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'INCLUDE_DIR'   , $globals->environment->absPath . 'core/lib/');
+      $globals->environment->vendorPath       = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VENDOR_DIR'   , $globals->environment->absPath . 'core/vendor/');
+      $globals->environment->libPath          = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'LIB_DIR'   , $globals->environment->absPath . 'core/lib/');
       
       $globals->environment->accessLevel     = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ACCESS_LEVEL'  , 'ADM' );
       
