@@ -60,10 +60,11 @@
       $globals->environment->systemLibPath    = $systemPath . 'lib/';
       $globals->environment->systemIncPath    = $systemPath . 'inc/';
       $globals->environment->systemPluginPath = $systemPath . 'plugin/';
-      $globals->environment->baseUrl          = '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL'      , $baseURL );
-      $globals->environment->rootUrl          = '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_URL'      , $baseURL . 'webroot/' );
-      $globals->environment->systemUrl        = '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'SYSTEM_URL'    , $systemURL);
-      $globals->environment->systemPluginUrl  = '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'PLUGIN_URL'    , $systemURL . 'plugin/');
+      $globals->environment->baseUrl          = '//' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL'      , $baseURL );
+      $globals->environment->rootUrl          = '//' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_URL'      , $baseURL . 'webroot/' );
+      $globals->environment->systemUrl        = '//' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'SYSTEM_URL'    , $systemURL);
+      $globals->environment->systemPluginUrl  = '//' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'PLUGIN_URL'    , $systemURL . 'plugin/');
+      $globals->environment->rootPath         = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_DIR'      , $globals->environment->absPath . 'webroot/');
       $globals->environment->viewPath         = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VIEW_DIR'      , $globals->environment->absPath . 'core/view/');
       $globals->environment->controllerPath   = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'CONTROLLER_DIR', $globals->environment->absPath . 'core/controller/');
       $globals->environment->modelPath        = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'MODEL_DIR'     , $globals->environment->absPath . 'core/model/');
