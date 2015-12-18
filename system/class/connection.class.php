@@ -11,13 +11,8 @@
 
 //CONSTANTES DA CLASSE
 
-//Defaults
-define( 'DB_NEW_LINK', true );
-define( 'DB_DEF_USR' , 'user' );
-define( 'DB_DEF_PASS', 'user$' );
-
 //Error msgs
-define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
+define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
 
 
@@ -48,7 +43,7 @@ define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
             }
          }
              
-         function __construct1( $dbHost )                            { $this->connect( $dbHost, DB_DEF_USR, DB_DEF_PASS ); }
+         function __construct1( $dbHost )                            { $this->connect( $dbHost, '', '' ); }
          function __construct3( $dbHost, $dbUser, $dbPass )          { $this->connect( $dbHost, $dbUser, $dbPass ); } 
          function __construct4( $dbHost, $dbUser, $dbPass, $dbName ) { $this->connect( $dbHost, $dbUser, $dbPass, $dbName ); } 
         
@@ -69,7 +64,7 @@ define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
          function get_connected() {   return ($this->conn ? true : false); }
          function get_msg() {         return $this->msg; }
          function get_lastCommand() { return $this->lastCommand; }
-         function get_lastId() {      return mysql_insert_id( $this->conn ); }
+         function get_lastId() {      return mysqli_insert_id( $this->conn ); }
 			function get_db()          { return $this->db; }
         
         
@@ -86,20 +81,24 @@ define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
 				$this->host = $dbHost;
 				$this->user = $dbUser;
 				$this->pwd  = $dbPass;
-				
-            $conn = @mysql_connect($dbHost, $dbUser, $dbPass, DB_NEW_LINK )
-                                    or die ( DB_CONNECTION_ERROR );
+            $this->db   = $dbName;
+               
+            $conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName );
             
-            mysql_query("SET NAMES 'utf8'", $conn);
-            mysql_query('SET character_set_connection=utf8', $conn);
-            mysql_query('SET character_set_client=utf8', $conn);
-            mysql_query('SET character_set_results=utf8', $conn);
+            //Verifica se conectou corretamente
+            if(mysqli_connect_errno()){
+               printf(DB_CONNECTION_ERROR, mysqli_connect_error());
+               exit();
+            }
             
             $this->conn = $conn;
             
-            if( !empty( $dbName ) )  $this->selectDb( $dbName );
-
-            return $conn;
+            $this->execute("SET NAMES 'utf8'");
+            $this->execute('SET character_set_connection=utf8');
+            $this->execute('SET character_set_client=utf8');
+            $this->execute('SET character_set_results=utf8');
+            
+            return $this;
          }
 
 
@@ -107,14 +106,14 @@ define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
          function selectDb( $dbName ){
 				
 				$this->db = $dbName;
-            return mysql_select_db( $dbName, $this->conn );
+            return $this->conn->select_db( $dbName );
 				
          }
 
 
          //Desconecta da base de dados
          function disconnect(){
-            return @mysql_close( $this->conn );
+            return @$this->conn->close();
          }
 
 
@@ -122,7 +121,7 @@ define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
 			//Reconecta a base de dados
 			function reconnect(){
 				
-				$this->disconnect();
+				$this->disconnect(); 
 				$this->connect( $this->host, $this->user, $this->pwd, $this->db );
 				
 			}
@@ -131,13 +130,11 @@ define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
 			//Verifica se o servidor está connectado
 			function isConnected(){
 				
-				//Se não for resource [ex. null, int, array, etc] é por que não está conectado
-				if( ! is_resource( $this->conn ) ) return false;
+				//Se não for objeto é por que não está conectado
+				if( ! is_object( $this->conn ) ) return false;
 				
-				//Se for resource e tiver dado mensagem de que o server caiu, é por que caiu e está desconectado
-				if( strpos( mysql_stat( $this->conn ), 'server has gone away' ) !== false ) return false;
-				
-				return true;
+				//Se for objeto, verifica se a conexão está ativa
+				return $this->conn->ping();
 				
 			}
 
@@ -147,38 +144,48 @@ define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
       
             $this->lastCommand = $sql;
             
-				if( ! $query = mysql_query( $sql, $this->conn ) ){
-
-					//Verifica se a conexão não caiu
-					if( !$this->isConnected() ){	
+            //Se não conseguir executar
+            if( $query = $this->conn->query( $sql ) ){
+               
+               //Verifica se a conexão não caiu
+					if( !$this->isConnected() ){
+               
+                  //Se tiver caido, tenta reconectar
 						$this->reconnect();
-						$query = mysql_query( $sql, $this->conn );
+                  
+						$query = $this->conn->query( $sql );
 					}
-					
-				}
-				
+            }
+            
             return $query;
          }
 
 
          //Executa um comando na base de dados
-         function execute( $query ){
+         function execute( $sql ){
 				
 				$ret = false;
 				
-            $this->lastCommand = $query;
-				
-            if( ! $ret = mysql_query( $query, $this->conn) ){
-					
-					//Verifica se a conexão não caiu
-					if( !$this->isConnected() ){				
+            $this->lastCommand = $sql;
+            
+				//Se não conseguir executar
+            if( !$stmt = $this->conn->prepare( $sql ) ){
+               
+               //Verifica se a conexão não caiu
+					if( !$this->isConnected() ){
+               
+                  //Se tiver caido, tenta reconectar
 						$this->reconnect();
-						$ret = mysql_query( $query, $this->conn);
+
+						if( $stmt = $this->conn->prepare( $sql ) ){
+                     return $stmt->execute();
+                  }
 					}
-					
-				}
-				
-				return $ret;
+            } else {
+               return $stmt->execute();
+            }
+            
+				return false;
          }
 
 
@@ -186,48 +193,42 @@ define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
          //Executa uma serie de comandos sql em uma transação
          function secureExec( $sql ){
             
-            $this->execute('SET AUTOCOMMIT=0');
-            $this->execute('START TRANSACTION');
+            if( ! is_array( $sql ) ) $sql = array( $sql );
             
-            if( is_array( $sql ) ){
+            $this->conn->autocommit( false );
+            $this->conn->begin_transaction( MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT );
                
-               foreach( $sql as $a ){
-                  
-                  if( ! $this->execute( $a ) ){
-                     $this->execute('ROLLBACK'); 
-                     $this->execute('SET AUTOCOMMIT=1');
-                     return false;
-                  }
-               }
-               
-            } else {
-               
-               if( ! $this->execute( $sql ) ){
-                  
-                  $this->execute('ROLLBACK'); 
-                  $this->execute('SET AUTOCOMMIT=1');
+            foreach( $sql as $a ){
+               if( ! $this->execute( $a ) ){
+                  $this->conn->rollback(); 
+                  $this->conn->autocommit( true );
                   return false;
                }
-               
             }
             
-            $this->execute('COMMIT');
-            $this->execute('SET AUTOCOMMIT=1');
+            $this->conn->commit();
+            $this->conn->autocommit( true );
+            
             return true;
          }
 
 
          //Carrega uma linha do resultSet
-         function fetch( $query, $lArray = false ){
+         function fetch( $query, $num = false ){
 
-            $lArray = ( $lArray ? MYSQL_NUM : MYSQL_ASSOC );
-   			$row = mysql_fetch_array( $query, $lArray );
+            $row = $query->fetch_array( $num ? MYSQLI_NUM : MYSQLI_ASSOC );
 				
             return $row;
          }
-
-
-
+         
+         
+         //Carrega todo o resultset em um array
+         function fetch_all( $query, $num = false ){
+            
+            for ($set = array (); $row = $query->fetch_array( $num ? MYSQLI_NUM : MYSQLI_ASSOC ); $set[] = $row);
+            
+            return $set;
+         }
 
 
 
@@ -259,9 +260,8 @@ define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
                $ret = $this->query( $sql );
                $row = $this->fetch( $ret );
                $n   = $row['a'];
-            } else {
-               $n = @mysql_num_rows( $query );
-               if( !is_numeric( $n ) ) $n = 0;
+            } elseif( get_class( $query ) == 'mysqli_result' ) {
+               $n = $query->num_rows;
             }
             
             return $n;
@@ -326,15 +326,12 @@ define( 'DB_CONNECTION_ERROR', 'Erro ao conectar na base de dados' );
                $sql .= ' limit ' . $max;
             }
 				
-				if( ! $this->execute( $sql ) ){
-					return array();
-				}
-				
+            
+            //Se for trazer resultados
 				if( $this->count( $sql ) ){
-	            $query = $this->query( $sql );
-	            while( $row = $this->fetch( $query, true ) ){
-	               $ret[] = $row[0];
-	            }
+	            $query  = $this->query( $sql );
+	            $result = $this->fetch_all( $query, true );
+               foreach( $result as $a ) $ret[] = $a[0];
 				}
 
             return $ret;
