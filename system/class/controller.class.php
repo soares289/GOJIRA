@@ -37,7 +37,9 @@
             //por isso não deve deixar ele passar daqui.
             try{
                $this->model       = Model::Load( $class , $globals );
-				} catch( Exception $e ){ /* =] */}
+				} catch( Exception $e ){
+               $this->model = new AppModel( $globals );
+            }
             
 			}
 
