@@ -79,7 +79,7 @@
       $globals->smarty->setTemplateDir( $globals->environment->viewPath );
       $globals->smarty->caching = TPL_CACHE;
       
-      
+      //Adiciona o controle de helpers (autoload)
       require_once( $globals->environment->systemIncPath . 'helpers.php' );
       
       //Cria o controller padrão de escopo de aplicação
@@ -96,3 +96,30 @@
       } else {
          class AppModel extends Model{};
       }
+      
+      
+      //Cria os parametos de inicialização das classes
+      if( isset( $_POST['class'] ) ){ 
+         //Para requisições ajax
+         //Ex: $.post("engine.php",{"class":'home','proc':'index'},function(data){});
+         $globals->environment->ajaxRequest = true;
+         $class = $_POST['class'];
+         $proc  = ( isset($_POST['proc']) ? $_POST['proc'] : '');
+         $param = array();
+         
+      } else {
+         //Cria os parametos base para o engine.php
+         //É possivel agora enviar isso via post diretamente
+         //Ex: $.post(baseURL + "home/index/",{},function(data){});
+         $curr_url  = parse_url( $globals->tools->curPageUrl() );
+         $base_url  = parse_url( $globals->environment->baseUrl );
+         list( $class, $proc, $param) = $globals->tools->queryToParam( substr( $curr_url['path'], strlen($base_url['path']) ) );
+         
+         if( $class == 'engine.php' ) $class = '';
+         if( $class == '' && isset( $_GET['query'] ) )
+            list( $class, $proc, $param) = $globals->tools->queryToParam( $_GET['query'] );
+      }
+      
+      $param = array_merge( $param, $_POST );
+      $param = array_merge( $param, $_GET );
+      

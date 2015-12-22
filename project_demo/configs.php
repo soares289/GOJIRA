@@ -36,7 +36,8 @@ define( 'SYSDIR_NAME', '../system/');
 
 
    //DB de testes
-   } elseif( strpos(strtolower( $_SERVER['HTTP_HOST'] ),'HOMOLOGAÇÃO') !== false ){
+   } elseif( strpos(strtolower( $_SERVER['HTTP_HOST'] ),'HOMOLOGACAO') !== false ){
+      
       
       error_reporting( E_ALL );
       
@@ -62,5 +63,30 @@ define( 'SYSDIR_NAME', '../system/');
    define('TPL_CACHE',0);
    
    require_once( $systemPath . 'init.php' );
+   require_once( $globals->environment->includePath . 'constant_ptbr.php' );
    
+   if( empty( $class ) ) $class = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'DEFAULT_CLASS' , 'home' );
+   if( empty( $proc  ) ) $proc  = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'DEFAULT_METHOD', 'index' );
+	
+   $globals->environment->accessLevel = 'USR';
+
+   //Variaveis de ambiente referente ao login
+   $globals->environment->logged = $globals->login->isLogged( $globals->environment->accessLevel );
    
+   if( $globals->environment->logged ){
+      $globals->user = new StdClass();
+      $globals->user->cod     = $globals->login->getLogged('Cod');
+      $globals->user->name    = $globals->login->getLogged('Name');
+      $globals->user->login   = $globals->login->getLogged('Login');
+      $globals->user->email   = $globals->login->getLogged('Email');
+      $globals->user->type    = $globals->login->getLogged('Type');
+      
+   } else {
+      $globals->user = new StdClass();
+      $globals->user->cod     = '';
+      $globals->user->name    = '';
+      $globals->user->login   = '';
+      $globals->user->email   = '';
+      $globals->user->type    = '';
+      
+   }
