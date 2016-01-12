@@ -215,7 +215,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
          //Carrega uma linha do resultSet
          function fetch( $query, $num = false ){
-
+            
             $row = $query->fetch_array( $num ? MYSQLI_NUM : MYSQLI_ASSOC );
 				
             return $row;
@@ -255,12 +255,14 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          //Conta o numero de registros no resultSet
          function count( $query ){
             
+            $n = false;
+            
             if( is_string( $query ) ){
                $sql = 'select count(*) as a from (' . $query . ') as a';
                $ret = $this->query( $sql );
                $row = $this->fetch( $ret );
                $n   = $row['a'];
-            } elseif( get_class( $query ) == 'mysqli_result' ) {
+            } elseif( is_object( $query ) && get_class( $query ) == 'mysqli_result' ) {
                $n = $query->num_rows;
             }
             

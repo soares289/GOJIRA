@@ -121,5 +121,4 @@
       }
       
       $param = array_merge( $param, $_POST );
-      $param = array_merge( $param, $_GET );
       
