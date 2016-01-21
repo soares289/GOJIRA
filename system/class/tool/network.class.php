@@ -5,8 +5,6 @@
 		Requisições a servidores externos, envio de emails, etc.
 */
 		
-		@include_once("Mail.php");
-		
 		
 		class Tool_Network{
 			

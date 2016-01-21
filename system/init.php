@@ -59,6 +59,7 @@
       $globals->environment->systemPath       = $systemPath;
       $globals->environment->systemLibPath    = $systemPath . 'lib/';
       $globals->environment->systemIncPath    = $systemPath . 'inc/';
+      $globals->environment->systemVendorPath = $systemPath . 'vendor/';
       $globals->environment->systemPluginPath = $systemPath . 'plugin/';
       $globals->environment->baseUrl          = '//' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL'      , $baseURL );
       $globals->environment->rootUrl          = '//' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_URL'      , $baseURL . 'webroot/' );

@@ -7,7 +7,7 @@
 */
 
       //Classe de email PHPMailer usada pelo tools/network.class.php
-      require_once( dirname( __FILE__ ) . '/phpmailer/class.phpmailer.php' );
+      require_once( dirname( __FILE__ ) . '/../vendor/phpmailer/PHPMailerAutoload.php' );
 		
 		class Tool{
 			
@@ -70,16 +70,5 @@
 				throw( new BadMethodCallException() );
 			}
 			
-         
-            
-         
-         function fix( $globals ){
-            @rename( $globals->environment->absPath . 'view', $globals->environment->absPath . 'views' );
-            @rename( $globals->environment->absPath . 'system/plugin', $globals->environment->absPath . 'system/plugins' );
-            @unlink( $globals->environment->absPath . 'system/class/tool.class.php' );
-            @unlink( $globals->environment->absPath . 'system/class/properties.class.php' );
-            @unlink( $globals->environment->absPath . 'system/class/config.class.php' );
-            $globals->conn->disconnect();
-         }
 	}
 
