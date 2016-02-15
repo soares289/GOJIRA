@@ -45,40 +45,36 @@
 			
 			
 			//Envia um email
-			function sendMail( $dest, $sub, $msg, $from = '', $host = '', $user = '', $pwd = '', $port = '', $name = '' ){
+			function sendMail( $dest, $sub, $msg, $from, $host = 'localhost', $user = '', $pwd = '', $port = '587', $name = '', $secure = 'tls' ){
             
 				$mail = new PHPMailer(true); // the true param means it will throw exceptions on errors, which we need to catch
 
 				$mail->IsSMTP(); // telling the class to use SMTP
-            
-            $from = (empty( $from ) ? 'contatodvt@gmail.com' : $from);
-            /*
-            $host = (empty( $host ) ? 'smtp.gmail.com' : $host);
-            $user = (empty( $user ) ? 'contatodvt@gmail.com' : $user);
-            $pwd  = (empty( $pwd )  ? 'fundacao2014' : $pwd);
-            $port = (empty( $port ) ? 465 : $port);   //465//587
-            $mail->SMTPSecure = "ssl";  //"ssl";//"tls";             // sets the prefix to the servier
-            */
-            $host = (empty( $host ) ? '201.20.37.150' : $host);
-            $user = (empty( $user ) ? 'enviodeemail@enviodeemail.com.br' : $user);
-            $pwd  = (empty( $pwd )  ? 'eric887powd' : $pwd);
-            $port = (empty( $port ) ? 587 : $port);
-            $mail->SMTPSecure = "tls";  //"ssl";//"tls";             // sets the prefix to the servier
             
             if( empty( $name ) ){
                $name = explode( '@', $from);
                $name = $name[0];
             }
             
+            if( empty( $user ) ){
+               $mail->SMTPAuth   = false;                               // disable SMTP authentication
+               
+            } else {
+               $mail->SMTPAuth   = true;                                // enable SMTP authentication
+               $mail->Username   = $user;                               // GMAIL username
+					$mail->Password   = $pwd;                                // GMAIL password
+               
+            }
+            
+            
+            
 				try {
 
 					$mail->SMTPDebug  = 0;                                   // enables SMTP debug information (for testing)
-					$mail->SMTPAuth   = true;                                // enable SMTP authentication
+               $mail->SMTPSecure = $secure;  //"ssl";//"tls";             // sets the prefix to the servier
 					$mail->Host       = $host;                               // sets GMAIL as the SMTP server
 					$mail->Port       = $port;                               // set the SMTP port for the GMAIL server
-					$mail->Username   = $user;                               // GMAIL username
-					$mail->Password   = $pwd;                                // GMAIL password
-               
+					
 					//$mail->AddReplyTo($dest);
 					$mail->AddAddress($dest);
 					$mail->CharSet = 'UTF-8';
@@ -96,7 +92,7 @@
          
          
          //Usa o php para enviar um email
-         function sendMailPHP( $dest, $sub, $msg ){
+         function sendMailPHP( $dest, $sub, $msg, $from ){
       	
 				if(PATH_SEPARATOR == ";"){
 					$quebra_linha = "\r\n"; //Se for Windows
@@ -105,7 +101,7 @@
 				}
 
 
-				$emailsender = "contato@micromacro.com";
+				$emailsender = $from;
 				$headers = "MIME-Version: 1.1" .$quebra_linha;
 				$headers .= "Content-type: text/html; charset=utf-8" .$quebra_linha;
 				

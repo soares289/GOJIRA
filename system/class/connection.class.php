@@ -223,7 +223,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          
          
          //Carrega todo o resultset em um array
-         function fetch_all( $query, $num = false ){
+         function fetchAll( $query, $num = false ){
             
             for ($set = array (); $row = $query->fetch_array( $num ? MYSQLI_NUM : MYSQLI_ASSOC ); $set[] = $row);
             
