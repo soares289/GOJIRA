@@ -112,8 +112,16 @@
          //Cria os parametos base para o engine.php
          //É possivel agora enviar isso via post diretamente
          //Ex: $.post(baseURL + "home/index/",{},function(data){});
+                  
+         //Filtra o protocolo que está sendo usado
+         $protocol = 'http';
+         if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") {
+            $protocol .= "s";
+         }
+         
          $curr_url  = parse_url( $globals->tools->curPageUrl() );
-         $base_url  = parse_url( $globals->environment->baseUrl );
+         $base_url  = parse_url( $protocol . ':' . $globals->environment->baseUrl );
+
          list( $class, $proc, $param) = $globals->tools->queryToParam( substr( $curr_url['path'], strlen($base_url['path']) ) );
          
          if( $class == 'engine.php' ) $class = '';
