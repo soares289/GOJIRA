@@ -55,7 +55,7 @@
 							
 							//Busca os arquivos de dentro do diretorio
                      $files[] = array('file' => $file, 'path' => $path, 'full' => $path . $file . '/', 'type' => filetype( $path . $file ), 'ext' => '');
-							$files = array_merge( $files, getFiles( $path . $file, $filter, true ) );
+							$files = array_merge( $files, $this->getFiles( $path . $file, $filter, true ) );
 							
 						} else {
 							

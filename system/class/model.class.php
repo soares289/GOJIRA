@@ -249,11 +249,11 @@
 			function group( $field ){ $this->sql['group'][] = $field; return $this; }
 			
          //having
-         function having( $sintax ){ $this->sql['having'][] = $sintax; }
+         function having( $sintax ){ $this->sql['having'][] = $sintax; return $this; }
          
          //Separadores do having
-         function hOr(){ $this->sql['having'][] = 'OR'; }
-         function hAnd(){ $this->sql['having'][] = 'AND'; }
+         function hOr(){ $this->sql['having'][] = 'OR'; return $this; }
+         function hAnd(){ $this->sql['having'][] = 'AND'; return $this; }
          
          
 			//Join

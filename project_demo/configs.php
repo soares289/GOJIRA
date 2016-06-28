@@ -63,7 +63,6 @@ define( 'SYSDIR_NAME', '../system/');
    define('TPL_CACHE',0);
    
    require_once( $systemPath . 'init.php' );
-   require_once( $globals->environment->includePath . 'constant_ptbr.php' );
    
    if( empty( $class ) ) $class = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'DEFAULT_CLASS' , 'home' );
    if( empty( $proc  ) ) $proc  = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'DEFAULT_METHOD', 'index' );
