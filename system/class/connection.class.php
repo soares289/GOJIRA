@@ -21,14 +21,21 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
     
       class Connection extends Properties{
     
-         private $conn;          //Objeto de conexão
-         private $msg;           //Mensagens de aviso ou erro
-         private $lastCommand;   //Ultimo comando executado
+         protected $conn;          //Objeto de conexão
+         protected $msg;           //Mensagens de aviso ou erro
+         protected $lastCommand;   //Ultimo comando executado
+         
          private $db;				//Base de dados em que está conectado
          private $host;				//Host atual conectado
 			private $user;				//Usuário que foi usado para conectar
 			private $pwd;				//Senha para a base de dados
-			
+         
+         
+         //Devido ao suporte fraco a constantes de objeto, vou deixa-los como propriedade
+         public $FETCH_OBJECT = 0;
+         public $FETCH_ASSOC  = MYSQLI_ASSOC;
+         public $FETCH_NUM    = MYSQLI_NUM;
+         
 			
          /***   Construtores ***/
          function __construct(){
@@ -117,7 +124,6 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          }
 
 
-
 			//Reconecta a base de dados
 			function reconnect(){
 				
@@ -189,7 +195,6 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          }
 
 
-
          //Executa uma serie de comandos sql em uma transação
          function secureExec( $sql ){
             
@@ -214,22 +219,25 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
 
          //Carrega uma linha do resultSet
-         function fetch( $query, $num = false ){
+         function fetch( $query, $type = MYSQLI_ASSOC){
             
-            $row = $query->fetch_array( $num ? MYSQLI_NUM : MYSQLI_ASSOC );
+            if( $type == $this->FETCH_OBJECT ){
+               $row = $query->fetch_object();
+            } else {
+               $row = $query->fetch_array( $type );
+            }
 				
             return $row;
          }
          
          
          //Carrega todo o resultset em um array
-         function fetchAll( $query, $num = false ){
+         function fetchAll( $query, $type = 0 ){
             
-            for ($set = array (); $row = $query->fetch_array( $num ? MYSQLI_NUM : MYSQLI_ASSOC ); $set[] = $row);
+            for($set = array (); $row = $this->fetch( $query, $type ); $set[] = $row);
             
             return $set;
          }
-
 
 
          //Seleciona o valor mais alto de uma coluna
@@ -270,9 +278,6 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          }
 
 
-
-
-
          //Verifica se um valor existe em um campo da tabela
          function exist( $table, $column = '', $value = '', $compare = ''){
             
@@ -305,7 +310,6 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			}
 			
 			
-			
 			//Verifica se um determinado campo existe na tabela
 			function fieldExist( $table, $field ){
 				
@@ -315,7 +319,6 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 				return $row['a'] > 0;
 				
 			}
-			
 			
 
          //Busca um valor de um campo especifico
@@ -340,7 +343,6 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
          }
 
-         
          
       } 
    

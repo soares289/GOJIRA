@@ -106,11 +106,13 @@
             //Carrega todo o arquivo config na memória
             } else {
                $this->cache = parse_ini_file( $this->file, true );
+
                foreach( $this->cache as $i => $a ){
                   foreach( $a as $ii => $aa ){
                      $this->cache[$i][$ii] = urldecode($aa);
                   }
                }
+
             }
 				
 			}
@@ -125,7 +127,7 @@
                if( count( $ck ) > 0 ){
                   fwrite( $f, "\n[" . $ci . "]\n" );
                   foreach( $ck as $ki => $kk ){
-                     fwrite( $f, $ki . '=' . urlencode($kk)  . "\n" );
+                     fwrite( $f, $ki . '="' . urlencode($kk) . "\"\n" );
                   }
                }
             }

@@ -4,13 +4,13 @@
 
 		require_once( "properties.class.php" );
 
-		abstract class Model extends Properties{
+		abstract class Model extends Connection{
 			
 			//Propriedades da classe
 			protected $globals;			//Valores globais do sistema
          protected $tools;
          protected $environment;
-			
+         
 			private   $table;				//Tabela base do modelo
 			private   $structure;		//Estrutura da tabela
 			private   $sql = array();  //SQL que deve ser usado na proxima busca
@@ -38,6 +38,7 @@
 				$this->globals     = $globals;
             $this->tools       = $globals->tools;
             $this->environment = $globals->environment;
+            $this->conn        = $globals->conn->conn;
 				$this->table       = strtolower( substr( get_class( $this ), 0, -6) );
 				$this->updateTableInfo();
 				$this->resetCommand();
@@ -248,11 +249,11 @@
 			function group( $field ){ $this->sql['group'][] = $field; return $this; }
 			
          //having
-         function having( $sintax ){ $this->sql['having'][] = $sintax; }
+         function having( $sintax ){ $this->sql['having'][] = $sintax; return $this; }
          
          //Separadores do having
-         function hOr(){ $this->sql['having'][] = 'OR'; }
-         function hAnd(){ $this->sql['having'][] = 'AND'; }
+         function hOr(){ $this->sql['having'][] = 'OR'; return $this; }
+         function hAnd(){ $this->sql['having'][] = 'AND'; return $this; }
          
          
 			//Join
@@ -622,6 +623,9 @@
 				return $ret;
 				
 			}
+         
+         
+         //Essa parte são metodos que existem apenas para poder utilizar o 
 			
 		}
 

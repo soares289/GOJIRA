@@ -54,8 +54,8 @@
 						if( is_dir( $path . $file ) && $recursive ){
 							
 							//Busca os arquivos de dentro do diretorio
-							$files[] = array('file' => $file, 'path' => $path . $file, 'type' => filetype( $path . $file ), 'ext' => '');
-							$files = array_merge( $files, getFiles( $path . $file, $filter, true ) );
+                     $files[] = array('file' => $file, 'path' => $path, 'full' => $path . $file . '/', 'type' => filetype( $path . $file ), 'ext' => '');
+							$files = array_merge( $files, $this->getFiles( $path . $file, $filter, true ) );
 							
 						} else {
 							
@@ -65,7 +65,8 @@
 							if( $filter == '*' || strpos( '|' . $filter, $ext) ){
 								$files[] = array('file' => utf8_encode( $file ),
                                          'name' => substr( $file, 0, strlen($file) - 1 - strlen($ext)),
-                                         'path' => utf8_encode( $path . $file ),
+                                         'path' => utf8_encode( $path ),
+                                         'full' => utf8_encode( $path . $file ),
                                          'type' => filetype( $path . $file ),
                                          'ext'  => $ext);
 							}
