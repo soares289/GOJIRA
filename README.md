@@ -14,3 +14,6 @@ TODOS
  - Compatibilizar com PHP 7.0
  - Documentação
  - Opção de carregar automaticamente data (no model) quando tem chaves estrangeiras (tipo um getAll ou getDeep)
+ - Remover libs de terceiro da pasta de lib (Vendor, talvez)
+ - Rever todos os componentes de terceiros no framework, se sao realmente necessarios
+
