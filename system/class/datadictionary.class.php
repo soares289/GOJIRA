@@ -5,27 +5,10 @@
    Ultimo update: 2015-11-30
 */
 
-      require_once( "properties.class.php" );
 
-      class DataDictionary extends Properties{
+      class DataDictionary extends GojiraCore{
          
          private $conn;  //Conexão com o banco de daods
-         
-         
-         /***   Construtores ***/
-         function __construct(){
-            
-            @session_start();
-            
-            $a = func_get_args();
-            $i = func_num_args();
-            
-            if (method_exists($this,$f='__construct'.$i)) {
-               call_user_func_array(array($this,$f),$a); 
-            } else {
-               throw( new Exception('Numero de parametros invalido') );
-            }
-         }
          
          
           

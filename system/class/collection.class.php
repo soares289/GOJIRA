@@ -1,7 +1,4 @@
 <?php
-
-		require_once( "properties.class.php" );
-
 		
 		abstract class Customization implements IteratorAggregate, Serializable, Countable, ArrayAccess{
 			

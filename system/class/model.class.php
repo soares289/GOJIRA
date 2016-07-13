@@ -2,47 +2,25 @@
 //TODO - SaveData (salva multiplos Rows)
 //TODO - Integrar com o schema (gerente de db)
 
-		require_once( "properties.class.php" );
-
 		abstract class Model extends Connection{
 			
 			//Propriedades da classe
 			protected $globals;			//Valores globais do sistema
-         protected $tools;
-         protected $environment;
          
 			private   $table;				//Tabela base do modelo
 			private   $structure;		//Estrutura da tabela
 			private   $sql = array();  //SQL que deve ser usado na proxima busca
-			
-			
-			/***   Construtores ***/
-			function __construct(){
-				
-				@session_start();
-				
-				$a = func_get_args();
-				$i = func_num_args();
-				
-				if (method_exists($this,$f='__construct'.$i)) {
-					call_user_func_array(array($this,$f),$a); 
-				} else {
-					throw( new Exception('Numero de parametros invalido') );
-				}
-			}
 			
 			 
 			//Construtores do objeto
 			function __construct1( $globals ){
 				
 				$this->globals     = $globals;
-            $this->tools       = $globals->tools;
-            $this->environment = $globals->environment;
             $this->conn        = $globals->conn->conn;
 				$this->table       = strtolower( substr( get_class( $this ), 0, -6) );
 				$this->updateTableInfo();
 				$this->resetCommand();
-				
+            
 			}
 			
 			

@@ -1,36 +1,14 @@
 <?php
 
-		require_once( "properties.class.php" );
-
-		abstract class Controller extends Properties{
+		abstract class Controller extends GojiraCore{
 			
 			//Propriedades da classe
 			protected $globals;
-         protected $tools;
-         protected $environment;
-			protected $model;
-			
-			
-			/***   Construtores ***/
-			function __construct(){
-				
-				@session_start();
-				
-				$a = func_get_args();
-				$i = func_num_args();
-				
-				if (method_exists($this,$f='__construct'.$i)) {
-					call_user_func_array(array($this,$f),$a); 
-				} else {
-					throw( new Exception('Numero de parametros invalido') );
-				}
-			}
+         protected $model;
 			 
 			function __construct1( $globals ){
 				
 				$this->globals     = $globals;
-            $this->tools       = $globals->tools;
-            $this->environment = $globals->environment;
             $class             = substr( get_class( $this ), 0, -11 );
             
             //Se o model não existir, gera um exception, mas nesse instante, isso é previsto

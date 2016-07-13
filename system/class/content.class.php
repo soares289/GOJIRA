@@ -5,9 +5,7 @@
    por Carlson A. Soares - 2013/01/23
 */
    
-   require_once( 'properties.class.php' );  //Propriedades
-   
-   class Content extends Properties{
+   class Content extends GojiraCore{
    
       private $conn;             //Classe de conexão
       private $tools;            //Classe com ferramentas necessarias para o funcionamento da classe

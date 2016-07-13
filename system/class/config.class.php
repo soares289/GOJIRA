@@ -10,30 +10,13 @@
 	
 */
 
-//CONSTANTES DA CLASSE
 
-
-		require_once( 'properties.class.php' );  //Propriedades
-    
-    
-		class Config extends Properties{
+		class Config extends GojiraCore{
     
          private $cache;
          private $file;
-        
-         /***   Construtores ***/
-         function __construct(){
-            
-            $a = func_get_args();
-            $i = func_num_args();
-            
-            if (method_exists($this,$f='__construct'.$i)) {
-               call_user_func_array(array($this,$f),$a); 
-            } else {
-               throw( new Exception('Numero de parametros invalido - Projeto.class.php') );
-            }
-         }
-             
+
+
          function __construct1( $appRoot ){
             $this->file = $appRoot . 'app_configs.ini';
             $this->create();

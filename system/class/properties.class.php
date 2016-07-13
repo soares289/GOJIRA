@@ -4,6 +4,9 @@
 	forma mais segura. usando emcapsulamento.
 	
 	por Carlson - 2011-02-17 08:59
+
+   Obs: Não é mais usada por padrão - Mantida por referencia e para
+        o caso de algum lib de terceiro desejar usar as funcionálidades.
 */
 
 

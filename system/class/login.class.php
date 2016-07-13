@@ -13,10 +13,9 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 //TODO - Permitir configurar a tabela para o USER_TYPE
 //TODO - Colocar o codigo do erro em constantes também
 
-	require_once( "properties.class.php" );
 	require_once( "log.class.php" );
 
-		class Login extends Properties{
+		class Login extends GojiraCore{
 			
 			//Propriedades da classe
 			private $conn;

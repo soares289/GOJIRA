@@ -14,12 +14,8 @@
 //Error msgs
 define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
-
-
-      require_once( 'properties.class.php' );  //Propriedades
     
-    
-      class Connection extends Properties{
+      class Connection extends GojiraCore{
     
          protected $conn;          //Objeto de conexão
          protected $msg;           //Mensagens de aviso ou erro
@@ -37,19 +33,6 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          public $FETCH_NUM    = MYSQLI_NUM;
          
 			
-         /***   Construtores ***/
-         function __construct(){
-            
-            $a = func_get_args();
-            $i = func_num_args();
-            
-            if (method_exists($this,$f='__construct'.$i)) {
-               call_user_func_array(array($this,$f),$a); 
-            } else {
-               throw( new Exception('Numero de parametros invalido') );
-            }
-         }
-             
          function __construct1( $dbHost )                            { $this->connect( $dbHost, '', '' ); }
          function __construct3( $dbHost, $dbUser, $dbPass )          { $this->connect( $dbHost, $dbUser, $dbPass ); } 
          function __construct4( $dbHost, $dbUser, $dbPass, $dbName ) { $this->connect( $dbHost, $dbUser, $dbPass, $dbName ); } 

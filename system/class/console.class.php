@@ -13,21 +13,20 @@
 //CONSTANTES DA CLASSE
 
 
-		require_once( 'properties.class.php' );  	//Propriedades
     	require_once( 'tool.class.php' );			//Tools
 		
     
-		class Console extends Properties{
+		class Console extends GojiraCore{
     		
 			private $tools;
 			
-         /***   Construtores ***/
-         function __construct(){
-				
-				@session_start();
-				$this->tools = new Tool();
-				
-			}
+         //Construtores do objeto
+         function __construct1( $tools ){
+
+            $this->tools = $tools;
+
+         }
+         
 			
 			public function execute( $cmd ){
 				

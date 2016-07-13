@@ -5,33 +5,13 @@
  *
  */
 	
-	require_once( 'properties.class.php' );
 
-
-		class Log extends Properties{
+		class Log extends GojiraCore{
 			
 			
 			//Propriedades da classe
 			private $conn;
 			private $tools;
-			
-			
-			/***   Construtores ***/
-			function __construct(){
-				
-				@session_start();
-				
-				$a = func_get_args();
-				$i = func_num_args();
-				
-				if (method_exists($this,$f='__construct'.$i)) {
-					call_user_func_array(array($this,$f),$a); 
-				} else {
-					throw( new Exception('Numero de parametros invalido') );
-				}
-				
-			}
-			
 			
 			
 			//Constructor com 2 parametros	 

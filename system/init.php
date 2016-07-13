@@ -3,6 +3,7 @@
 //TODO - Verificar se conexão foi realizada com sucesso, se não, gerar uma exception
 //TODO - Remover a pasta JS do sistema, pensar em algo melhor pra fazer com aquilo
 
+      @session_start();
       
       //Precisa saber a pasta do sistema que está sendo iniciado
       if( !isset( $absPath ) ) throw( new Exception('$absPath não localizado') );
@@ -25,6 +26,7 @@
       date_default_timezone_set('America/Sao_Paulo');
       
       //Classes BASE usadas por quase tudo
+      require_once( $systemPath . 'class/gojiracore.class.php' );
       require_once( $systemPath . 'class/tool.class.php' );
       require_once( $systemPath . 'class/connection.class.php' );
       require_once( $systemPath . 'class/config.class.php' );
