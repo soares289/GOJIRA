@@ -46,7 +46,7 @@
          }
 			
 			//Executa um método dentro do model
-			static function Call( $class, $method, $globals, &$param){
+			static function Call( $class, $method, $globals, $param){
             
                $objController = Controller::Load( $class, $globals );
                
