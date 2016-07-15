@@ -16,7 +16,7 @@
 			function __construct1( $globals ){
 				
 				$this->globals     = $globals;
-            $this->conn        = $globals->conn->conn;
+            $this->conn        = $this->globals->conn->conn;
 				$this->table       = strtolower( substr( get_class( $this ), 0, -6) );
 				$this->updateTableInfo();
 				$this->resetCommand();
@@ -29,7 +29,7 @@
 			//propriedades do objeto
 			//$table
 			function set_table( $val ){
-				if( $this->globals->conn->tableExist( $val ) ){
+				if( $this->tableExist( $val ) ){
 					
 					$this->table = $val;
 					$this->updateTableInfo();
@@ -157,7 +157,7 @@
 			function countCommand(){
 
 				$sql = $this->makeCommand();			
-				return $this->globals->conn->count( $sql );
+				return $this->count( $sql );
 				
 			}
 			
@@ -178,7 +178,6 @@
 			function getCommandData( $lReset = true){
 				
 				$index = 0;
-				$conn  = $this->globals->conn;
 				
 				try{
 					$sql  = $this->makeCommand();
@@ -188,17 +187,17 @@
 				
 				$ret  = new CustomData( null );
 				
-				if( $conn->count( $sql ) > 0 ){
+				if( $this->count( $sql ) > 0 ){
 					
-					$query = $conn->query( $sql );
-					$row   = $conn->fetch( $query );
+					$query = $this->query( $sql );
+					$row   = $this->fetch( $query );
 					
 					do{
 						foreach( $row as $i => $a ){
 							$ret[ $index ][ $i ] = $a;
 						}
 						$index++;
-					} while( $row = $conn->fetch( $query ) );
+					} while( $row = $this->fetch( $query ) );
 					
 				}
 				
@@ -245,7 +244,6 @@
 			//Atualiza as informações da tabela
 			function updateTableInfo(){
 				
-				$conn =  $this->globals->conn;
 				$sql  =  'SELECT COLUMN_NAME AS `name`, ' .
 							       'COLUMN_DEFAULT as `default`, ' .
 							       'IS_NULLABLE = "YES" AS `null`, ' .
@@ -259,11 +257,11 @@
 							   'FROM information_schema.COLUMNS ' .
 							  			'WHERE TABLE_SCHEMA="' . $this->globals->db->name . '" ' .
 										  'AND TABLE_NAME="' . $this->table . '" ORDER BY ORDINAL_POSITION';
-
-				$query = $this->globals->conn->query( $sql );
-				
+            
+				$query = $this->query( $sql );
+               
 				$this->structure = array();
-				while( $row = $conn->fetch( $query ) ){
+				while( $row = $this->fetch( $query ) ){
 					
 					$obj = new StdClass();
 					$obj->name              = $row['name'];
@@ -290,7 +288,6 @@
 				$this->updateTableInfo();
 				
 				//Busca as informações usadas no processo
-				$conn    = $this->globals->conn;
 				$tools   = $this->globals->tools;
 				$primary = array();
 				$where   = '';
@@ -336,10 +333,10 @@
 				if( is_array( $limit ) ) $limit = $limit[0] . (isset( $limit[1] ) ? ', ' . $limit[1] : '');
 				if( !empty( $limit ) )   $sql .= ' LIMIT ' . $limit;
 				
-				$query = $conn->query( $sql );
+				$query = $this->query( $sql );
 
-				if( $conn->count( $sql ) > 0 ){
-					while( $row = $conn->fetch( $query ) ){
+				if( $this->count( $sql ) > 0 ){
+					while( $row = $this->fetch( $query ) ){
 					
 						$pk =	'';
 						foreach( $primary as $a ) $pk .= (empty( $pk ) ? '' : ',' ) . $row[ $a->name ];
@@ -361,7 +358,7 @@
 				
 				if( !empty( $where ) ) $sql .= ' WHERE ' . $where;
 				
-				return $this->globals->conn->count( $sql );	
+				return $this->count( $sql );	
 				
 			}
 			
@@ -383,7 +380,7 @@
 				
 				$sql = 'DELETE FROM `' . $this->table . '` WHERE ' . $this->getWhere( $key );
 				
-				if( ! $this->globals->conn->execute( $sql ) ){
+				if( ! $this->execute( $sql ) ){
 					throw( new ModelException( "Error while deleting the registry", 2102 ) );
 				}
 				
@@ -398,8 +395,6 @@
 				$table     = (empty( $table ) ? $this->table : $table);
 				$sql       = '';
 				$where     = '';
-				
-				$conn      = $this->globals->conn;
 				
 				$structure = $row->structure;
 				$pk        = array();
@@ -436,7 +431,7 @@
 				//Monta a sentença de comparação no caso de ser um update e usa para identificar o mesmo
 				foreach( $pk as $i => $a ) $where .= (empty( $where ) ? '' : ' AND ') . '`' . $i . '`="' . $a . '"';
 				
-				if( $conn->exist( $table, "1", 1, $where ) ){
+				if( $this->exist( $table, "1", 1, $where ) ){
 					
 					//É uma alteração
 					foreach( $structure as $col ){
@@ -463,14 +458,14 @@
 				}
             
 				//Executa o comando na base de dados
-				if( $conn->execute( $sql ) ){
+				if( $this->execute( $sql ) ){
 					
    				$sql = $where = '';
 					
 					foreach( $pk as $i => $a ){
 					    	
 						if( $structure[ $i ]->is_auto_increment && (empty( $a ) || strtolower($a) == 'null') ){
-							$a = $conn->lastId;
+							$a = $this->lastId;
 						}
 						
 						$where .= (empty( $sql ) ? '' : ' AND ') . '`' . $i . '`="' . $a . '"';
@@ -480,7 +475,8 @@
 					
 					$sql = 'SELECT ' . $sql . ' FROM `' . $table . '` WHERE ' . $where;
                
-					$row = $conn->fetch( $conn->query( $sql, true ) );
+               $query = $this->query( $sql, true );
+					$row   = $this->fetch( $query );
 					
 				} else {
 					

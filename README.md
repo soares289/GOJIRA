@@ -16,4 +16,4 @@ TODOS
  - Opção de carregar automaticamente data (no model) quando tem chaves estrangeiras (tipo um getAll ou getDeep)
  - Remover libs de terceiro da pasta de lib (Vendor, talvez)
  - Rever todos os componentes de terceiros no framework, se sao realmente necessarios
-
+ - Quando integrar o ENGINE.php no system, desconectar automaticamente a base de dados, já que não está mais no destruct do objeto de conexão

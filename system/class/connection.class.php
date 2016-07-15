@@ -38,9 +38,13 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          function __construct4( $dbHost, $dbUser, $dbPass, $dbName ) { $this->connect( $dbHost, $dbUser, $dbPass, $dbName ); } 
         
          //Destructor força a desconexão do banco de dados;
-         function __destruct() {
+         //Desativado porque tava dando problema: Como o model extende connection,
+         //Esse destruct desconectava no final do model, dando problema se tentasse usar a conexão
+         //Em outros pontos apos o termino do model.
+         //TODO - Deixar isso co engine.php quando ele for integrado ao system
+         /*function __destruct() {
             $this->disconnect();
-         }
+         }*/
         
         
         

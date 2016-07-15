@@ -28,7 +28,7 @@
 
       //Busca propriedades inexistentes dentro do globals
       function __get( $index ){
-         echo "\n" . get_class( $this ) . "\n";
+         
          //Funcionalidade original, para trabalhar com funções set/get
          if (method_exists($this, ($method = 'get_'.$index))) {
 				return $this->$method();;
