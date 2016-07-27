@@ -42,8 +42,14 @@
       
       //Define a variavel global, caso ela ainda não exista
       if( !isset( $globals ) )              $globals              = new StdClass();
-      if( !isset( $globals->db ) )          $globals->db          = new StdClass();
       if( !isset( $globals->environment ) ) $globals->environment = new StdClass();
+      if( !isset( $globals->db ) ){
+         $globals->db           = new StdClass();
+         $globals->db->host     = '';
+         $globals->db->user     = '';
+         $globals->db->password = '';
+         $globals->db->name     = '';
+      }
       
       //Objetos mais comumente usados
       $globals->tools    = new Tool();
@@ -99,7 +105,6 @@
       } else {
          class AppModel extends Model{};
       }
-      
       
       //Cria os parametos de inicialização das classes
       if( isset( $_POST['class'] ) ){ 

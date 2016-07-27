@@ -15,11 +15,14 @@
 			//Construtores do objeto
 			function __construct1( $globals ){
 				
+            
 				$this->globals     = $globals;
             $this->conn        = $this->globals->conn->conn;
 				$this->table       = strtolower( substr( get_class( $this ), 0, -6) );
-				$this->updateTableInfo();
-				$this->resetCommand();
+            if( !in_array(get_class( $this ), ['Model','AppModel'] ) ){
+               $this->updateTableInfo();
+               $this->resetCommand();
+            }
             
 			}
 			
@@ -258,26 +261,27 @@
 							  			'WHERE TABLE_SCHEMA="' . $this->globals->db->name . '" ' .
 										  'AND TABLE_NAME="' . $this->table . '" ORDER BY ORDINAL_POSITION';
             
-				$query = $this->query( $sql );
-               
-				$this->structure = array();
-				while( $row = $this->fetch( $query ) ){
-					
-					$obj = new StdClass();
-					$obj->name              = $row['name'];
-					$obj->default_value     = $row['default'];
-					$obj->accept_null       = $row['null'];
-					$obj->field_type        = $row['type'];
-					$obj->length            = $row['length'];
-					$obj->decimal           = $row['decimal'];
-					$obj->is_primary_key    = $row['primary_key'];
-					$obj->is_auto_increment = $row['auto_increment'];
-					$obj->is_unique         = $row['unique'];
-					$obj->is_index          = $row['index'];
-					
-					$this->structure[ $row['name'] ] = $obj;
-				}
-			
+            if( $this->isConnected() ){
+               $query = $this->query( $sql );
+                  
+               $this->structure = array();
+               while( $row = $this->fetch( $query ) ){
+                  
+                  $obj = new StdClass();
+                  $obj->name              = $row['name'];
+                  $obj->default_value     = $row['default'];
+                  $obj->accept_null       = $row['null'];
+                  $obj->field_type        = $row['type'];
+                  $obj->length            = $row['length'];
+                  $obj->decimal           = $row['decimal'];
+                  $obj->is_primary_key    = $row['primary_key'];
+                  $obj->is_auto_increment = $row['auto_increment'];
+                  $obj->is_unique         = $row['unique'];
+                  $obj->is_index          = $row['index'];
+                  
+                  $this->structure[ $row['name'] ] = $obj;
+               }
+            }
 			}
 			
 			

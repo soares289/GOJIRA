@@ -7,4 +7,7 @@ RewriteRule ^system/(.*) system/$1 [L]
 RewriteRule ^webroot/(.*) webroot/$1 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ engine.php [QSA,L]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ engine.php?query=$1&%{QUERY_STRING} [L]
+
+RewriteRule ^ engine.php?%{QUERY_STRING} [L]

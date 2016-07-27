@@ -76,7 +76,10 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 				$this->user = $dbUser;
 				$this->pwd  = $dbPass;
             $this->db   = $dbName;
-               
+            
+            //Quando não existe o host, identifica como uma sessão sem conexão com o banco
+            if( empty( $dbHost ) ) return false;
+            
             $conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName );
             
             //Verifica se conectou corretamente
@@ -134,22 +137,13 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
          //Executa uma consulta no banco de dados
          function query( $sql ){
-      
+            
             $this->lastCommand = $sql;
             
-            //Se não conseguir executar
-            if( $query = $this->conn->query( $sql ) ){
+            if( !$this->isConnected() ) $this->reconnect();
                
-               //Verifica se a conexão não caiu
-					if( !$this->isConnected() ){
+            $query = $this->conn->query( $sql );
                
-                  //Se tiver caido, tenta reconectar
-						$this->reconnect();
-                  
-						$query = $this->conn->query( $sql );
-					}
-            }
-            
             return $query;
          }
 
@@ -161,20 +155,10 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 				
             $this->lastCommand = $sql;
             
-				//Se não conseguir executar
-            if( !$stmt = $this->conn->prepare( $sql ) ){
-               
-               //Verifica se a conexão não caiu
-					if( !$this->isConnected() ){
-               
-                  //Se tiver caido, tenta reconectar
-						$this->reconnect();
-
-						if( $stmt = $this->conn->prepare( $sql ) ){
-                     return $stmt->execute();
-                  }
-					}
-            } else {
+            if( !$this->isConnected() ) $this->reconnect();
+            
+				//Executa o comando
+            if( $stmt = $this->conn->prepare( $sql ) ){
                return $stmt->execute();
             }
             

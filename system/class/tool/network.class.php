@@ -132,7 +132,7 @@
 				curl_setopt ($ch, CURLOPT_TIMEOUT, 20);
 				
 				//Seguir redirects
-				curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
+				@curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
 				
 				//Enganar o servidor, para que ele acredite que seja um usuário
 			   curl_setopt($ch, CURLOPT_HEADER, false);
