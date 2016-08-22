@@ -21,8 +21,8 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          protected $msg;           //Mensagens de aviso ou erro
          protected $lastCommand;   //Ultimo comando executado
          
-         private $db;				//Base de dados em que está conectado
-         private $host;				//Host atual conectado
+         protected $db;				//Base de dados em que está conectado
+         protected $host;			//Host atual conectado
 			private $user;				//Usuário que foi usado para conectar
 			private $pwd;				//Senha para a base de dados
          
@@ -60,6 +60,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          function get_lastCommand() { return $this->lastCommand; }
          function get_lastId() {      return mysqli_insert_id( $this->conn ); }
 			function get_db()          { return $this->db; }
+         function get_host()        { return $this->host; }
         
         
         
@@ -272,10 +273,9 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			//Verifica se a tabela existe
 			function tableExist( $table ){
 				
-				
-				$sql = 'select count(*) as a from information_schema.TABLES where TABLE_SCHEMA="' . $this->db . '" and TABLE_NAME="' . $table . '"';
-				$row = $this->fetch( $this->query( $sql ) );
-				
+				$sql = 'SELECT COUNT(*) AS a FROM information_schema.TABLES WHERE TABLE_SCHEMA="' . $this->db . '" and TABLE_NAME="' . $table . '"';
+  				$row = $this->fetch( $this->query( $sql ) );
+
 				return $row['a'] > 0;
 				
 			}

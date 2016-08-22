@@ -18,7 +18,9 @@
             
 				$this->globals     = $globals;
             $this->conn        = $this->globals->conn->conn;
-				$this->table       = strtolower( substr( get_class( $this ), 0, -6) );
+            $this->db          = $this->globals->conn->db;
+            $this->host        = $this->globals->conn->host;
+            $this->table       = strtolower( substr( get_class( $this ), 0, -6) );
             if( !in_array(get_class( $this ), ['Model','AppModel'] ) ){
                $this->updateTableInfo();
                $this->resetCommand();
