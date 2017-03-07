@@ -7,6 +7,13 @@ Framework baseado no padrão MVC para rapido desenvolvimento de sistemas web
 
 
 TODOS
+ - Ver possibilidade de parametos serem posicionais e não nominais
+ - Alterar SendMail
+      - Verificar se a classe existe
+      - De vez de receber parametos opcionais, receber um parameto config
+ - Alterar a forma como o app_configs.ini funciona
+      - Ele tem que ser feito de uma forma que em qualquer ambiente funcione, independente da estrutura de pasta anterior a raiz do app.
+      - Se possivel, o mesmo com a url
  - Remover o ENGINE.PHP do APP, deixar interno no framework
  - Implementar ROUTES
  - Adicionar USES no controller (auto-instanciar model - Pensar se compensa)
