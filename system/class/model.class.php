@@ -83,6 +83,38 @@
 			}
 
 
+			//Adiciona um campo na consulta SQL
+			protected function field( $name, $alias = '', $table = '' ){ $this->sql['field'][] = array( $name, $alias, $table ); return $this; }
+
+			//From - No caso de fazer um select de outra tabela, sem precisar mudar o campo TABLE
+			protected function from( $table ){ $this->sql['table'] = $table; return $this; }
+
+			//Comparações
+			protected function where( $field, $compare, $value ){ $this->sql['where'][] = array($field, $compare, $value ); return $this; }
+
+			//Separadores do where
+			protected function wOr(){   $this->sql['where'][ count( $this->sql['where'] ) - 1 ][] = 'OR';   return $this; }
+			protected function wAnd(){	$this->sql['where'][ count( $this->sql['where'] ) - 1 ][] = 'AND';  return $this; }
+
+			//order by
+			protected function order( $ord, $dir = 'ASC' ){ $this->sql['order'][] = array($ord, $dir); return $this; }
+
+			//Group by
+			protected function group( $field ){ $this->sql['group'][] = $field; return $this; }
+
+         //having
+         protected function having( $sintax ){ $this->sql['having'][] = $sintax; return $this; }
+
+         //Separadores do having
+         protected function hOr(){ $this->sql['having'][] = 'OR'; return $this; }
+         protected function hAnd(){ $this->sql['having'][] = 'AND'; return $this; }
+
+			//Join
+			protected function join( $type, $table, $comp, $alias = '' ){ $this->sql[ 'join' ][] = array( $type, $table, $comp, $alias );  return $this; }
+
+			//Limit de registros
+			protected function limit( $init, $end = 0 ){ $this->sql[ 'limit' ] = array( $init, $end); return $this; }
+
 			//Gera o comando sql da consulta
 			private function makeCommand( $obj = null){
 
@@ -182,7 +214,7 @@
 
 
 			//Retorna um objeto com as variaveis para gerar um comando sql
-			function getCommandObj( $lReset = true){
+			function getCommandObject( $lReset = true ){
 
 				$obj          = new StdClass();
 				$obj->sql     = $this->sql;
@@ -194,9 +226,7 @@
 			}
 
 			//Retorna o valor do comando
-			function getCommandData( $lReset = true){
-
-				$index = 0;
+			function getCommandData( $lReset = true, $lArray = false ){
 
 				try{
 					$sql  = $this->makeCommand();
@@ -204,19 +234,12 @@
 					throw( $e );
 				}
 
-				$ret  = new CustomData( null );
+				$ret = [];
 
 				if( $this->count( $sql ) > 0 ){
 
 					$query = $this->query( $sql );
-					$row   = $this->fetch( $query );
-
-					do{
-						foreach( $row as $i => $a ){
-							$ret[ $index ][ $i ] = $a;
-						}
-						$index++;
-					} while( $row = $this->fetch( $query ) );
+               $ret   = $this->makeDataObject( $query, $lArray );
 
 				}
 
@@ -225,38 +248,38 @@
 
 			}
 
-			//Adiciona um campo na consulta SQL
-			function field( $name, $alias = '', $table = '' ){ $this->sql['field'][] = array( $name, $alias, $table ); return $this; }
 
-			//From - No caso de fazer um select de outra tabela, sem precisar mudar o campo TABLE
-			function from( $table ){ $this->sql['table'] = $table; return $this; }
+         protected function makeDataObject( $query, $lArray = false, $primary = null ){
 
-			//Comparações
-			function where( $field, $compare, $value ){ $this->sql['where'][] = array($field, $compare, $value ); return $this; }
+            $ret   = [];
+            $index = -1;
 
-			//Separadores do where
-			function wOr(){   $this->sql['where'][ count( $this->sql['where'] ) - 1 ][] = 'OR';   return $this; }
-			function wAnd(){	$this->sql['where'][ count( $this->sql['where'] ) - 1 ][] = 'AND';  return $this; }
+            while( $row = $this->fetch( $query ) ){
 
-			//order by
-			function order( $ord, $dir = 'ASC' ){ $this->sql['order'][] = array($ord, $dir); return $this; }
+               //Monta o indice usando as chaves primarias, caso não tenha as chaves, usa um indice numerico
+               if( is_array( $primary )){
+                  $index = implode( ',', $primary );
 
-			//Group by
-			function group( $field ){ $this->sql['group'][] = $field; return $this; }
+               } else {
+                  $index++;
+               }
 
-         //having
-         function having( $sintax ){ $this->sql['having'][] = $sintax; return $this; }
+               if( $lArray ){
+                  $ret[ $index ] = [];
+                  foreach( $row as $i => $a ){
+                     $ret[ $index ][$i] = $a;
+                  }
 
-         //Separadores do having
-         function hOr(){ $this->sql['having'][] = 'OR'; return $this; }
-         function hAnd(){ $this->sql['having'][] = 'AND'; return $this; }
+               } else {
+                  $ret[ $index ] = new StdClass();
+                  foreach( $row as $i => $a ){
+                     $ret[ $index ]->$i = $a;
+                  }
+               }
+            }
 
-
-			//Join
-			function join( $type, $table, $comp, $alias = '' ){ $this->sql[ 'join' ][] = array( $type, $table, $comp, $alias );  return $this; }
-
-			//Limit de registros
-			function limit( $init, $end = 0 ){ $this->sql[ 'limit' ] = array( $init, $end); return $this; }
+            return $ret;
+         }
 
 
 
@@ -311,14 +334,14 @@
 
 				//Busca as informações usadas no processo
 				$tools   = $this->globals->tools;
-				$primary = array();
+				$primary = [];
 				$where   = '';
-				$data    = new CustomData( $this->structure );
+				$data    = [];
 
 
 				//Filtra as partes usadas
 				$primary = $this->getPrimary();
-				$where   = $this->getWhere( $key, $primary );
+				$where   = $this->getWhere( $key );
 
 				$sql = 'SELECT ';
 				foreach( $this->structure as $col ){
@@ -358,14 +381,10 @@
 
 				$query = $this->query( $sql );
 
+
 				if( $this->count( $sql ) > 0 ){
-					while( $row = $this->fetch( $query ) ){
+               $data = $this->makeDataObject( $query, false, $primary );
 
-						$pk =	'';
-						foreach( $primary as $a ) $pk .= (empty( $pk ) ? '' : ',' ) . $row[ $a->name ];
-						foreach( $row as $i => $a ) $data[ $pk ][ $i ] = $a;
-
-					}
 				}
 
 				return $data;
@@ -387,12 +406,23 @@
 
 
 			//Retorna um objeto row com os valores padroes dos campos
-			function getEmptyRow(){
+			function getEmptyRow( $lArray = false ){
 
-				$row = new CustomRow( $this->structure );
+            if( $lArray ){
+               $row = [];
+            } else {
+               $row = new StdClass();
+            }
+
 				foreach( $this->structure as $a ){
-					$row[ $a->name ] = ($a->default_is_null ? 'NULL' : $a->default_value);
+               if( $lArray ){
+                  $row[ $a->name ] = ($a->default_is_null ? 'NULL' : $a->default_value);
+               } else {
+                  $key       = ($a->name);
+                  $row->$key = ($a->default_is_null ? 'NULL' : $a->default_value);
+               }
 				}
+
 				return $row;
 
 			}
@@ -413,20 +443,26 @@
 
 
 			//Salva uma linha na base de dados
-			function saveRow( $row, $table = '', $retCommand = false ){
+			function saveRow( $row, $retCommand = false ){
 
-				$table     = (empty( $table ) ? $this->table : $table);
+				$table     = $this->table;
 				$sql       = '';
 				$where     = '';
-
-				$structure = $row->structure;
-				$pk        = array();
+				$structure = $this->structure;
+				$pk        = [];
 				$lUpdate   = false;
+
+            //Padronizando para facilitar o acesso aos dados daqui para frente
+            if( !is_array( $row ) ){
+               $tmp = [];
+               foreach( $row as $i => $a ) $tmp[ $i ] = $a;
+               $row = $tmp;
+            }
 
 				//Verifica se os dados estão ok
 				foreach( $structure as $col ){
 
-               $col_value = $row[ $col->name ]->value;
+               $col_value = $row[ $col->name ];
 
 					//Campos auto_increment ou timestamp são ignorados na hora de salvar, por isso, não precisa de verificação
 					if( !(($col->is_auto_increment && empty($col_value)) || $col->field_type == 'timestamp') ){
@@ -439,14 +475,14 @@
 						//Se o campo estiver nulo, mas não aceitar valores nulos
 						if( $col->accept_null == false &&
 							 $col->is_auto_increment == false &&
-                      (is_null( $row[ $col->name ]->value ) || strtolower($row[ $col->name ]->value === 'null')) ){
+                      (is_null( $col_value ) || strtolower( $col_value === 'null')) ){
 							throw( new ModelException( 'Field <strong>' . $col->name . '</strong> cannot be null', 2104 ) );
 						}
 					}
 
-					$this->formatField( $row[ $col->name ] );
+               if( $col->is_primary_key ) $pk[ $col->name ] = $col_value;
 
-					if( $col->is_primary_key ) $pk[ $col->name ] = $row[ $col->name ]->value;
+					$row[ $col->name ] = $this->formatField( $col, $col_value );
 
 				}
 
@@ -458,9 +494,9 @@
 
 					//É uma alteração
 					foreach( $structure as $col ){
-						if( ! ( ($col->is_auto_increment || $col->is_primary_key) && $this->sqlField( $row[ $col->name ] ) == 'NULL' ) ){
+						if( ! ( ($col->is_auto_increment || $col->is_primary_key) && $this->sqlField( $col, $row[ $col->name ] ) == 'NULL' ) ){
 							$sql .= (empty( $sql ) ? '' : ', ' );
-							$sql .= '`' . $col->name . '`=' . $this->sqlField( $row[ $col->name ]);
+							$sql .= '`' . $col->name . '`=' . $this->sqlField( $col, $row[ $col->name ]);
 						}
 					}
 
@@ -472,9 +508,9 @@
 					//É uma inclusão
 					$header = '';
 					foreach( $structure as $col ){
-						if( ! ($col->is_auto_increment && $this->sqlField( $row[ $col->name ] ) == 'NULL' ) ){
+						if( ! ($col->is_auto_increment && $this->sqlField( $col, $row[ $col->name ] ) == 'NULL' ) ){
 							$header .= (empty( $sql ) ? '' : ', ') . '`' . $col->name . '`';
-							$sql    .= (empty( $sql ) ? '' : ', ') . $this->sqlField( $row[ $col->name ] );
+							$sql    .= (empty( $sql ) ? '' : ', ') . $this->sqlField( $col, $row[ $col->name ] );
 						}
 					}
 					$sql     = 'INSERT INTO `' . $table . '`(' . $header . ') VALUES(' . $sql . ')';
@@ -517,12 +553,12 @@
 			//Busca um array com as chaves primarias da estrutura
 			function getPrimary( $structure = ''){
 
-				$primary = array();
+				$primary = [];
             if( empty( $structure ) ) $structure = $this->structure;
 
 				//Seleciona todas as chaves primarias( caso exista mais de uma )
 				foreach( $structure as $col ){
-					if( $col->is_primary_key ) $primary[] = $col;
+					if( $col->is_primary_key ) $primary[] = $col->name;
 				}
 
 				return $primary;
@@ -545,7 +581,7 @@
 
 				}elseif( is_numeric( $key ) ){
 
-               $where .= $primary[ 0 ]->name . '="' . $tools->antiInjection( $key ) . '"';
+               $where .= $primary[ 0 ] . '="' . $tools->antiInjection( $key ) . '"';
 
             } elseif( is_string( $key ) ){
 
@@ -556,7 +592,7 @@
                $c = 0;
                foreach( $key as $a ){
                   if( $c < count( $primary ) )
-                     $where .= (strlen( $where ) <= 0 ? '' : ' AND ') . $primary[ $c ]->name . '="' . $a . '"';
+                     $where .= (strlen( $where ) <= 0 ? '' : ' AND ') . $primary[ $c ] . '="' . $a . '"';
                   $c++;
                }
 
@@ -568,70 +604,67 @@
 
 
 			//Formata o campo baseado no seu conteudo
-			function formatField( $field ){
+			function formatField( $format, $value ){
 
 				$tools = $this->globals->tools;
 
-            if( strpos( '[blog][mediumblob][bigblob][tinyblob][smallblob][text][mediumtext][bigtext][tinytext][smalltext]', $field->format->field_type ) ){
-               $field->value = $tools->antiInjection( $field->value, true, true );
+            if( strpos( '[blog][mediumblob][bigblob][tinyblob][smallblob][text][mediumtext][bigtext][tinytext][smalltext]', $format->field_type ) ){
+               $value = $tools->antiInjection( $value, true, true );
             } else {
-               $field->value = $tools->antiInjection( $field->value );
+               $value = $tools->antiInjection( $value );
             }
 
 
 				//Formatando as datas para o formato mysql
-            if( $field->value == 'NULL' ){
-               $field->value = 'NULL';
+            if( $value != 'NULL'  && ! preg_match( $this->mysqlFuncRegex, $value ) ){
 
-            } elseif( ! preg_match( $this->mysqlFuncRegex, $field->value ) ){
-
-               if( $field->format->field_type == 'datetime' && (strlen( $field->value ) == 16 || strlen( $field->value ) == 19) ){
-                  $field->value = $tools->dateToSql( $field->value, true );
-               } elseif( $field->format->field_type == 'date' && (strlen( $field->value ) == 10 || strlen( $field->value ) == 8) ){
-                  $field->value = $tools->dateToSql( $field->value );
+               if( $format->field_type == 'datetime' && (strlen( $value ) == 16 || strlen( $value ) == 19) ){
+                  $value = $tools->dateToSql( $value, true );
+               } elseif( $format->field_type == 'date' && (strlen( $value ) == 10 || strlen( $value ) == 8) ){
+                  $value = $tools->dateToSql( $value );
                }
             }
 
+            return $value;
 
 			}
 
 
 			//formata o campo para o mysql
-			function sqlField( $field ){
+			function sqlField( $format, $value ){
 
 				$ret = '';
 
-            if( trim($field->value) == '' ){
-               $ret = '"' . $field->value . '"';
+            if( trim($value) == '' ){
+               $ret = '"' . $value . '"';
 
             } else {
 
-               if( $field->value == 'NULL' ){
+               if( $value == 'NULL' ){
                   $ret = 'NULL';
 
-               } elseif( preg_match( $this->mysqlFuncRegex, $field->value ) ){
-                  $ret = $field->value;
+               } elseif( preg_match( $this->mysqlFuncRegex, $value ) ){
+                  $ret = $value;
 
-               } elseif( strpos( '[timestamp][datetime][date][integer][decimal][double][float][int][smallint][bigint][tinyint][unsigned]', $field->format->field_type ) !== false ){
-                  $ret = $field->value;
+               } elseif( strpos( '[timestamp][datetime][date][integer][decimal][double][float][int][smallint][bigint][tinyint][unsigned]', $format->field_type ) !== false ){
+                  $ret = $value;
 
-               } elseif( $field->format->field_type == 'enum' ){
-                  if( $field->value > 0 ){
-                     $ret = $field->value;
+               } elseif( $format->field_type == 'enum' ){
+                  if( $value > 0 ){
+                     $ret = $value;
                   } else {
-                     $ret = '"' . $field->value . '"';
+                     $ret = '"' . $value . '"';
                   }
 
                } else {
-                  $ret = '"' . addslashes(stripslashes($field->value)) . '"';
+                  $ret = '"' . addslashes(stripslashes($value)) . '"';
                }
 				}
+
 				return $ret;
 
 			}
 
-
-         //Essa parte são metodos que existem apenas para poder utilizar o
 
 		}
 
