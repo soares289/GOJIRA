@@ -258,7 +258,9 @@
 
                //Monta o indice usando as chaves primarias, caso não tenha as chaves, usa um indice numerico
                if( is_array( $primary )){
-                  $index = implode( ',', $primary );
+                  $index = [];
+                  foreach( $primary as $a ) $index[] = $row[ $a ];
+                  $index = implode( ',', $index );
 
                } else {
                   $index++;
