@@ -540,7 +540,7 @@
 					$row   = $this->fetch( $query );
 
 				} else {
-
+               
 					//Se der erro na hora de salvar, joga um erro para o nivel de cima
 					throw( new ModelException( "Error while saving - " . $sql, 2105 ) );
 
@@ -620,7 +620,7 @@
 				//Formatando as datas para o formato mysql
             if( $value != 'NULL'  && ! preg_match( $this->mysqlFuncRegex, $value ) ){
 
-               if( $format->field_type == 'datetime' && (strlen( $value ) == 16 || strlen( $value ) == 19) ){
+               if( ($format->field_type == 'datetime' || $format->field_type == 'timestamp') && (strlen( $value ) == 16 || strlen( $value ) == 19) ){
                   $value = $tools->dateToSql( $value, true );
                } elseif( $format->field_type == 'date' && (strlen( $value ) == 10 || strlen( $value ) == 8) ){
                   $value = $tools->dateToSql( $value );
