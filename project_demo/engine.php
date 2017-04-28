@@ -6,7 +6,7 @@
    try{
    
       //Esses valores devem vir do [systemPath]/init.php
-      $objData = Controller::Call( $class, $proc, $globals, $param );
+      $objData = Controller::Call( $class, $proc, $param, $globals );
       
       //Retorna o view
       $template_ext = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'TEMPLATE_EXTENSION', '.html');
