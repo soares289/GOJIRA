@@ -381,12 +381,9 @@
 				if( is_array( $limit ) ) $limit = $limit[0] . (isset( $limit[1] ) ? ', ' . $limit[1] : '');
 				if( !empty( $limit ) )   $sql .= ' LIMIT ' . $limit;
 
-				$query = $this->query( $sql );
-
-
 				if( $this->count( $sql ) > 0 ){
-               $data = $this->makeDataObject( $query, false, $primary );
-
+               $query = $this->query( $sql );
+               $data  = $this->makeDataObject( $query, false, $primary );
 				}
 
 				return $data;
@@ -418,10 +415,10 @@
 
 				foreach( $this->structure as $a ){
                if( $lArray ){
-                  $row[ $a->name ] = ($a->default_is_null ? 'NULL' : $a->default_value);
+                  $row[ $a->name ] = ($a->default_is_null ? NULL : $a->default_value);
                } else {
                   $key       = ($a->name);
-                  $row->$key = ($a->default_is_null ? 'NULL' : $a->default_value);
+                  $row->$key = ($a->default_is_null ? NULL : $a->default_value);
                }
 				}
 
@@ -540,7 +537,7 @@
 					$row   = $this->fetch( $query );
 
 				} else {
-               
+
 					//Se der erro na hora de salvar, joga um erro para o nivel de cima
 					throw( new ModelException( "Error while saving - " . $sql, 2105 ) );
 
