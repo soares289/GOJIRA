@@ -12,9 +12,11 @@
       if( !isset( $systemPath ) ) $systemPath = str_replace( "\\", "/", dirname(__FILE__) ) . '/';
 
       //Localiza a URL base
-      $baseURL = $_SERVER['SERVER_NAME'] . (isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '');
-      $baseURL = substr( $baseURL, 0, min(strrpos( $baseURL, '/' ), strlen( $baseURL )) );
-      if( substr( $baseURL, -1, 1 ) != '/' ) $baseURL .= '/';
+      if( !isset( $baseURL )){
+         $baseURL = $_SERVER['SERVER_NAME'] . (isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '');
+         $baseURL = substr( $baseURL, 0, min(strrpos( $baseURL, '/' ), strlen( $baseURL )) );
+         if( substr( $baseURL, -1, 1 ) != '/' ) $baseURL .= '/';
+      }
 
       //Se não tiver a url do sistema, gera agora
       //Em boa parte dos casos vai ser assim, mas talvez tenha como deixar isso mais preciso
@@ -52,35 +54,47 @@
          $globals->db->name     = '';
       }
 
+      //Verifica se tem os dados para conexão
+      $globals->conn = new Connection( $globals->db->host, $globals->db->user, $globals->db->password);
+
+      //Se conectado
+      if( $globals->conn->connected && !empty( $globals->db->name )){
+         //Seleciona o db configurado
+         $globals->conn->selectDb( $globals->db->name );
+      }
+
       //Objetos mais comumente usados
-      $globals->tools    = new Tool();
-      $globals->conn     = new Connection( $globals->db->host, $globals->db->user, $globals->db->password, $globals->db->name);
-      $globals->cfg      = new Config( $absPath );
-      $globals->smarty   = new Smarty();
-      $globals->login    = new Login( $globals->conn, $globals->tools );
+      $globals->tools  = new Tool();
+      $globals->cfg    = new Config( $absPath );
+      $globals->smarty = new Smarty();
+      $globals->login  = new Login( $globals->conn, $globals->tools );
+
+
+      
+      
 
       $protocol = 'http' . (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on" ? 's' : '');
 
       //Dados referentes ao environment do sistema
       $globals->environment->protocol         = $protocol;
       $globals->environment->absPath          = $absPath;
-
+      
       $globals->environment->systemPath       = $systemPath;
       $globals->environment->systemLibPath    = $systemPath . 'lib/';
       $globals->environment->systemIncPath    = $systemPath . 'inc/';
       $globals->environment->systemVendorPath = $systemPath . 'vendor/';
       $globals->environment->systemPluginPath = $systemPath . 'plugin/';
-      $globals->environment->baseUrl          = '//' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL'      , $baseURL );
-      $globals->environment->rootUrl          = '//' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_URL'      , $baseURL . 'webroot/' );
-      $globals->environment->systemUrl        = '//' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'SYSTEM_URL'    , $systemURL);
-      $globals->environment->systemPluginUrl  = '//' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'PLUGIN_URL'    , $systemURL . 'plugin/');
-      $globals->environment->rootPath         = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_DIR'      , $globals->environment->absPath . 'webroot/');
-      $globals->environment->viewPath         = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VIEW_DIR'      , $globals->environment->absPath . 'core/view/');
-      $globals->environment->controllerPath   = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'CONTROLLER_DIR', $globals->environment->absPath . 'core/controller/');
-      $globals->environment->modelPath        = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'MODEL_DIR'     , $globals->environment->absPath . 'core/model/');
-      $globals->environment->includePath      = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'INCLUDE_DIR'   , $globals->environment->absPath . 'core/inc/');
-      $globals->environment->vendorPath       = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VENDOR_DIR'   , $globals->environment->absPath . 'core/vendor/');
-      $globals->environment->libPath          = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'LIB_DIR'   , $globals->environment->absPath . 'core/lib/');
+      $globals->environment->baseUrl          = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL'      , $baseURL );
+      $globals->environment->rootUrl          = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_URL'      , $baseURL . 'webroot/' );
+      $globals->environment->systemUrl        = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'SYSTEM_URL'    , $systemURL);
+      $globals->environment->systemPluginUrl  = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'PLUGIN_URL'    , $systemURL . 'plugin/');
+      $globals->environment->rootPath         = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_DIR'      , 'webroot/');
+      $globals->environment->viewPath         = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VIEW_DIR'      , 'core/view/');
+      $globals->environment->controllerPath   = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'CONTROLLER_DIR', 'core/controller/');
+      $globals->environment->modelPath        = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'MODEL_DIR'     , 'core/model/');
+      $globals->environment->includePath      = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'INCLUDE_DIR'   , 'core/inc/');
+      $globals->environment->vendorPath       = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VENDOR_DIR'    , 'core/vendor/');
+      $globals->environment->libPath          = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'LIB_DIR'       , 'core/lib/');
 
       $globals->environment->accessLevel     = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ACCESS_LEVEL'  , 'ADM' );
 

@@ -41,11 +41,16 @@
 
             }
 
+            //Finaliza a conexão
+            $globals->conn->disconnect();
+
          //Se der erro em alguma coisa, faz com que todos fiquem sabendo
          } catch( ControllerException $e ){
 
             die( $e->getMessage() . ' in line <strong>' . $e->getLine() . '</strong>' );
-
+            
+            //Finaliza a conexão
+            $globals->conn->disconnect();
          }
       }
    }
