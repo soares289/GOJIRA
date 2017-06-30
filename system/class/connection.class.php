@@ -204,7 +204,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          
          
          //Carrega todo o resultset em um array
-         function fetchAll( $query, $type = 0 ){
+         function fetchAll( $query, $type = MYSQLI_ASSOC ){
             
             for($set = array (); $row = $this->fetch( $query, $type ); $set[] = $row);
             

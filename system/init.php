@@ -142,8 +142,8 @@
          }
 
          $curr_url  = parse_url( $globals->tools->curPageUrl() );
-         $base_url  = parse_url( $protocol . ':' . $globals->environment->baseUrl );
-
+         $base_url  = parse_url( $globals->environment->baseUrl );
+         
          list( $class, $proc, $param) = $globals->tools->queryToParam( substr( $curr_url['path'], strlen($base_url['path']) ) );
 
          if( $class == 'engine.php' ) $class = '';
