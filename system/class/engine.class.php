@@ -28,6 +28,7 @@
             $globals->smarty->assign( 'cfg'        , $globals->cfg );
             $globals->smarty->assign( 'login'      , $globals->login );
             $globals->smarty->assign( 'environment', $globals->environment );
+            $globals->smarty->assign( 'env'        , $globals->environment );
             $globals->smarty->assign( 'user'       , $globals->user );
             $globals->smarty->assign( 'globals'    , $globals );
 
