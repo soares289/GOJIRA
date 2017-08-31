@@ -8,6 +8,7 @@ Framework baseado no padrão MVC para rapido desenvolvimento de sistemas web
 
 TODOS
  - Implementar ROUTES
+ - Revisão completa do Loader.js
  - Implemenar criação de tabela automáticamente no log.class.php
  - Tornar conexão com a base de dados opcional
  - Revisar helpers

@@ -4,6 +4,8 @@
 
       static function Render( $class, $proc, $param ){
 
+         $class   = strtolower( $class );
+         $proc    = strtolower( $proc );
          $globals = $GLOBALS['globals'];
 
          try{

@@ -68,7 +68,7 @@ $(document).ready(function(){
 		if( hash.length > 3 ){
 			for( var c = 3; c < hash.length; c += 2 ){	
 				if( c < (hash.length-1) ){
-					if( hash[ c ] == "t" ){
+					if( hash[ c ] == "target" ){
 						target = "#" + hash[ c + 1 ];
 					} else {
 						query  += "&" + hash[ c ] + "=" + hash[ c + 1 ];

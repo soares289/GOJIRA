@@ -293,10 +293,10 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			
 
          //Busca um valor de um campo especifico
-         function getVal( $table, $field, $compare, $max = 0 ){
+         function getValue( $table, $field, $compare, $max = 0 ){
          
             $ret = array();
-            $sql = 'select ' . $field . ' from ' . $table . ' where ' . $compare;
+            $sql = 'select ' . $field . ' AS a from ' . $table . ' where ' . $compare;
             
             if( $max > 0 || is_string( $max ) ){
                $sql .= ' limit ' . $max;
@@ -306,8 +306,8 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
             //Se for trazer resultados
 				if( $this->count( $sql ) ){
 	            $query  = $this->query( $sql );
-	            $result = $this->fetch_all( $query, true );
-               foreach( $result as $a ) $ret[] = $a[0];
+	            $result = $this->fetchAll( $query );
+               foreach( $result as $a ) $ret[] = $a['a'];
 				}
 
             return $ret;

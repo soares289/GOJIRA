@@ -514,7 +514,7 @@
 					}
 					$sql     = 'INSERT INTO `' . $table . '`(' . $header . ') VALUES(' . $sql . ')';
 				}
-
+            
 				//Executa o comando na base de dados
 				if( $this->execute( $sql ) ){
 
@@ -607,6 +607,8 @@
 
 				$tools = $this->globals->tools;
 
+            if( is_null( $value ) ) return $value;
+
             if( strpos( '[blog][mediumblob][bigblob][tinyblob][smallblob][text][mediumtext][bigtext][tinytext][smalltext]', $format->field_type ) ){
                $value = $tools->antiInjection( $value, true, true );
             } else {
@@ -634,12 +636,12 @@
 
 				$ret = '';
 
-            if( trim($value) == '' ){
+            if( is_string($value) && trim($value) == '' ){
                $ret = '"' . $value . '"';
 
             } else {
 
-               if( $value == 'NULL' ){
+               if( strtolower( $value ) == 'null' || is_null( $value ) ){
                   $ret = 'NULL';
 
                } elseif( preg_match( $this->mysqlFuncRegex, $value ) ){
@@ -649,7 +651,7 @@
                   $ret = $value;
 
                } elseif( $format->field_type == 'enum' ){
-                  if( $value > 0 ){
+                  if( is_int($value) && $value > 0 ){
                      $ret = $value;
                   } else {
                      $ret = '"' . $value . '"';
