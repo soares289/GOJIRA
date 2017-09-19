@@ -62,8 +62,14 @@
                //Se o metodo existir
 					if( method_exists( $objController, $method ) ){
 
-						//Retorna o resultado da função dentro do model
-						return call_user_func_array( array( $objController, $method), array( $param ));
+                  //Retorna o resultado da função dentro do model
+                  if( $objController->beforeCall( $class, $method, $param) !== false ){
+                     return call_user_func_array( array( $objController, $method), array( $param ));
+
+                  } else {
+                     //Execução não altorizada
+						   throw( new ControllerException( "Unauthorized execution for method <strong>\"" . $method . "\"</strong> in Controller Object <strong>\"" . $class . "\"</strong>", 0x1002 ) );
+                  }
 
 					} else {
 
@@ -73,7 +79,13 @@
 
 
 
-			}
+         }
+         
+
+         //Executa antes do método chamado ser executado
+         function beforeCall( $class, $method, $param ){
+            return true;
+         }
 
 
 		}
