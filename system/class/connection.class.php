@@ -26,8 +26,11 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			private $user;				//Usuário que foi usado para conectar
 			private $pwd;				//Senha para a base de dados
          
-         
-         //Devido ao suporte fraco a constantes de objeto, vou deixa-los como propriedade
+
+         //As propriedades estão ai para manter compatibilidade com sistemas antigos
+         const FETCH_OBJECT = 0;
+         const FETCH_ASSOC  = MYSQLI_ASSOC;
+         const FETCH_NUM    = MYSQLI_NUM;
          public $FETCH_OBJECT = 0;
          public $FETCH_ASSOC  = MYSQLI_ASSOC;
          public $FETCH_NUM    = MYSQLI_NUM;
