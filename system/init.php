@@ -144,11 +144,13 @@
          $curr_url  = parse_url( $globals->tools->curPageUrl() );
          $base_url  = parse_url( $globals->environment->baseUrl );
          
-         list( $class, $proc, $param) = $globals->tools->queryToParam( substr( $curr_url['path'], strlen($base_url['path']) ) );
-
-         if( $class == 'engine.php' ) $class = '';
-         if( $class == '' && isset( $_GET['query'] ) )
+         if( isset( $_GET['query'] ) ){
             list( $class, $proc, $param) = $globals->tools->queryToParam( $_GET['query'] );
+         }
+         if( empty( $class ) ){
+            list( $class, $proc, $param) = $globals->tools->queryToParam( substr( $curr_url['path'], strlen($base_url['path']) ) );
+         }
+         
       }
 
       $param = array_merge( $param, $_POST );
