@@ -139,7 +139,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
                $_SESSION[ $row['type'] . "Email"]   = $row['email'];
                $_SESSION[ $row['type'] . "Name"]    = $row['name'];
                $_SESSION[ $row['type'] . "Type"]    = $row['type'];
-               $_SESSION[ $row['type'] . "Typecod"] = $row['type_cod'];
+               $_SESSION[ $row['type'] . "TypeCod"] = $row['type_cod'];
 				}
             
 				//Loga o login
