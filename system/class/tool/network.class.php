@@ -151,7 +151,7 @@
             
             //Download de arquivos, não utilizar para arquivos muito grande
             if( !empty( $outFile ) ){
-               $fb = fopen( $outFile, 'w+');
+               $fp = fopen( $outFile, 'w+');
                curl_setopt($ch, CURLOPT_FILE, $fp);
             }
             //Para arquivos grandes, ver doc ref: curl_setopt($ch, CURLOPT_WRITEFUNCTION, "curl_callback");
