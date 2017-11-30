@@ -119,7 +119,7 @@
          
 			
 			//Busca o conteudo de uma url usando curl
-			function curlGet( $url, $sendPost = '', $ref = '' ){
+			function curlGet( $url, $sendPost = '', $outFile = '', $ref = '' ){
 				
 				
 				$ch   = curl_init();
@@ -148,7 +148,14 @@
 				if( !empty( $ref ) ){
 					curl_setopt($ch, CURLOPT_REFERER, $ref);
 				}
-				
+            
+            //Download de arquivos, não utilizar para arquivos muito grande
+            if( !empty( $outFile ) ){
+               $fb = fopen( $outFile, 'w+');
+               curl_setopt($ch, CURLOPT_FILE, $fp);
+            }
+            //Para arquivos grandes, ver doc ref: curl_setopt($ch, CURLOPT_WRITEFUNCTION, "curl_callback");
+
 				$ret = curl_exec($ch);
 				curl_close($ch);
 				
