@@ -12,19 +12,17 @@
             
             $id  = '';
             $ret = '';
-
-            if( preg_match( '/(youtube\.|youtu\.be)/i', $url) && !preg_match('/feature\=youtu\.be/i', $url) ){
-					
+            
+            if( preg_match( '/(youtube\.|youtu\.be)/i', $url) ){
 					$ret = 'youtube';
 					$id  = $this->getYoutubeId( $url );
 					
 				} elseif( strpos( strtolower($url), 'vimeo') > 0 ) {
-					
 					$ret = 'vimeo';
 					$id  = $this->getVimeoId( $url );
 					
 				}
-				
+
 				return array( $id, $ret );
 				
 			}
@@ -33,24 +31,23 @@
 			
 			//Pega o ID do video no Youtuve
 		   function getYoutubeId( $url ){
-		      
+
 		      if( ! preg_match( '/(youtube\.|youtu\.be)/i', $url) ){
 		         return '';
 		      }
             
-            
-            if( strpos( strtolower($url), 'youtu.be' ) !== false ){  //É um link encurtado youtu.be/YDsa3a_3a
+
+            if( preg_match('/youtu.be/i', $url) && !preg_match('/feature\=youtu\.be/i', $url) ){  //É um link encurtado youtu.be/YDsa3a_3a
                $aUrl = explode( '/', $url );
                return end( $aUrl );
 
             } else {
-               
                if( !strpos($url, "#!v=") === false ){  //Em caso de ser um link de quando clica nos related
                   $url = str_replace('#!v=','?v=',$url);
                }
-               
+
                parse_str( parse_url( $url, PHP_URL_QUERY ) );
-               
+
                if( isset( $v ) ){
                   return $v;
                } else { //Se não achou, é por que é o link de um video de canal ex: http://www.youtube.com/user/laryssap#p/a/u/1/SAXVMaLL94g
@@ -86,8 +83,7 @@
 		   //Adiciona um embeded do youtube ou Vimeo
 		   function embedVideo( $id, $width, $height, $type = "youtube", $autoplay = false, $url = false ){
 		
-		      
-				if( strtolower( $type ) == "youtube" ){
+		      if( strtolower( $type ) == "youtube" ){
 					
 					if( $url ){
 						$ret = 'http://www.youtube.com/embed/' . $id . '?rel=0&wmode=transparent&autoplay=' . ($autoplay ? 1 : 0);
@@ -108,7 +104,7 @@
 		   }
 
 
-		
+
 			//Busca o thumb do video (Se possivel)
 			function getVideoThumb( $videoId, $videoSrc ){
 				
