@@ -9,8 +9,11 @@
 			
 			//Verifica qual tipo de video e retorna o ID do mesmo e o tipo
 			function getVideoId( $url ){
-				
-				if( strpos( strtolower($url), 'youtube') > 0 ){
+            
+            $id  = '';
+            $ret = '';
+
+            if( preg_match( '/(youtube\.|youtu\.be)/i', $url) ){
 					
 					$ret = 'youtube';
 					$id  = $this->getYoutubeId( $url );
@@ -31,27 +34,32 @@
 			//Pega o ID do video no Youtuve
 		   function getYoutubeId( $url ){
 		      
-		      if( strpos( strtolower( $url ), 'youtube' ) === false ){
+		      if( ! preg_match( '/(youtube\.|youtu\.be)/i', $url) ){
 		         return '';
 		      }
-		      
-		      if( strlen( $url ) < 22 ){
-		         return '';
-		      }
-		      
-		      if( !strpos($url, "#!v=") === false ){  //Em caso de ser um link de quando clica nos related
-		         $url = str_replace('#!v=','?v=',$url);
-		      }
-		
-		      parse_str( parse_url( $url, PHP_URL_QUERY ) );
-		
-		      if( isset( $v ) ){
-		         return $v;
-		      } else { //Se não achou, é por que é o link de um video de canal ex: http://www.youtube.com/user/laryssap#p/a/u/1/SAXVMaLL94g
-		         $aUrl = end(explode( '/', $url ));
-		         //return substr( $url, strrpos( $url,'/') + 1, 11);
-		         return $aUrl;
-		      }
+            
+            
+            if( strpos( strtolower($url), 'youtu.be' ) !== false ){  //É um link encurtado youtu.be/YDsa3a_3a
+               $aUrl = explode( '/', $url );
+               return end( $aUrl );
+
+            } else {
+               
+               if( !strpos($url, "#!v=") === false ){  //Em caso de ser um link de quando clica nos related
+                  $url = str_replace('#!v=','?v=',$url);
+               }
+               
+               parse_str( parse_url( $url, PHP_URL_QUERY ) );
+               
+               if( isset( $v ) ){
+                  return $v;
+               } else { //Se não achou, é por que é o link de um video de canal ex: http://www.youtube.com/user/laryssap#p/a/u/1/SAXVMaLL94g
+                  $aUrl = explode( '/', $url );
+                  //return substr( $url, strrpos( $url,'/') + 1, 11);
+                  return end($aUrl);
+               }
+
+            }
 		   }
 			
 			
@@ -59,17 +67,13 @@
 			//Pega o ID do video no Vimeo
 		   function getVimeoId( $url ){
 		      
-		      if( strpos( strtolower( $url ), 'vimeo' ) === false ){
+		      if( !preg_match('/vimeo\./i', $url) ){
 		         return '';
 		      }
 				
-		      if( strlen( $url ) < 18 ){
-		         return '';
-		      }
-		      
 				$id = end( explode( "/", $url ) );
 				
-				if( strlen( $id ) != 8 ){
+				if( strlen( $id ) < 8 ){
 					return '';
 				}
 				
