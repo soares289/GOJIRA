@@ -13,7 +13,7 @@
             $id  = '';
             $ret = '';
 
-            if( preg_match( '/(youtube\.|youtu\.be)/i', $url) && !preg_match('/feature\=youtu\.be/i') ){
+            if( preg_match( '/(youtube\.|youtu\.be)/i', $url) && !preg_match('/feature\=youtu\.be/i', $url) ){
 					
 					$ret = 'youtube';
 					$id  = $this->getYoutubeId( $url );
