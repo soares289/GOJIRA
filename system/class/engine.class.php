@@ -26,13 +26,14 @@
             $globals->smarty->assign( 'proc'       , $proc );
             $globals->smarty->assign( 'param'      , $param );
             $globals->smarty->assign( 'objData'    , $objData );
-            $globals->smarty->assign( 'tools'      , $globals->tools );
-            $globals->smarty->assign( 'cfg'        , $globals->cfg );
-            $globals->smarty->assign( 'login'      , $globals->login );
-            $globals->smarty->assign( 'environment', $globals->environment );
-            $globals->smarty->assign( 'env'        , $globals->environment );
-            $globals->smarty->assign( 'user'       , $globals->user );
             $globals->smarty->assign( 'globals'    , $globals );
+            $globals->smarty->assign( 'env'        , $globals->environment );
+
+            foreach( $globals as $index => $obj ){
+               if( !preg_match('/db|conn|smarty/i', $index) ){
+                  $globals->smarty->assign( $index, $globals->$index );   
+               }
+            }
 
 
             //Renderiza o view
