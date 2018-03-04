@@ -46,10 +46,11 @@
                   $url = str_replace('#!v=','?v=',$url);
                }
 
-               parse_str( parse_url( $url, PHP_URL_QUERY ) );
+               $args = [];
+               parse_str( parse_url( $url, PHP_URL_QUERY ), $args );
 
-               if( isset( $v ) ){
-                  return $v;
+               if( isset( $args['v'] ) ){
+                  return $args['v'];
                } else { //Se não achou, é por que é o link de um video de canal ex: http://www.youtube.com/user/laryssap#p/a/u/1/SAXVMaLL94g
                   $aUrl = explode( '/', $url );
                   //return substr( $url, strrpos( $url,'/') + 1, 11);
