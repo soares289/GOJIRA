@@ -51,7 +51,7 @@
 
                if( isset( $args['v'] ) ){
                   return $args['v'];
-               } else { //Se não achou, é por que é o link de um video de canal ex: http://www.youtube.com/user/laryssap#p/a/u/1/SAXVMaLL94g
+               } else { //Se não achou, é por que é o link de um video de canal ex: https://www.youtube.com/user/dasdas#p/a/u/1/SAXVMaLL94g
                   $aUrl = explode( '/', $url );
                   //return substr( $url, strrpos( $url,'/') + 1, 11);
                   return end($aUrl);
