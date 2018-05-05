@@ -70,9 +70,14 @@
 				if( file_exists(  $dir . $file ) ){
 
 					//Instancia o objeto
-					require_once( $dir . $file );
-					return new $class( $globals );
-
+               require_once( $dir . $file );
+               try{
+                  $objModel = new $class( $globals );
+                  return $objModel;
+               } catch( Exception $e ){
+                  throw( new ModelException( "Error in instantiation of Model <strong>\"" . $class . "\"</strong> MSG: " . $e->getMessage(), 0x2002 ) );
+               }
+               
 				} else {
 
 					//Model não localizado no disco
@@ -125,7 +130,7 @@
 
 				//Parte dos campos
 				if( !isset( $obj->sql[ 'field' ] ) || count( $obj->sql[ 'field' ] ) <= 0 )
-               throw( new ModelException( 'No <strong>fields</strong> defined for the command', 2101 ) );
+               throw( new ModelException( 'No <strong>fields</strong> defined for the command', 0x2011 ) );
 
 
 				$sql = 'SELECT ';
@@ -433,7 +438,7 @@
 				$sql = 'DELETE FROM `' . $this->table . '` WHERE ' . $this->getWhere( $key );
 
 				if( ! $this->execute( $sql ) ){
-					throw( new ModelException( "Error while deleting the registry", 2102 ) );
+					throw( new ModelException( "Error while deleting the registry", 0x2012 ) );
 				}
 
 				return true;
@@ -468,14 +473,14 @@
 
 						//Verifica se é chave primaria e tem um valor
 						if( $col->is_primary_key && empty( $col_value ) ){
-							throw( new ModelException( 'Primary Key <strong>' . $col->name . '</strong> has no value and are not auto_increment', 2103 ) );
+							throw( new ModelException( 'Primary Key <strong>' . $col->name . '</strong> has no value and are not auto_increment', 0x2013 ) );
 						}
 
 						//Se o campo estiver nulo, mas não aceitar valores nulos
 						if( $col->accept_null == false &&
 							 $col->is_auto_increment == false &&
                       (is_null( $col_value ) || strtolower( $col_value === 'null')) ){
-							throw( new ModelException( 'Field <strong>' . $col->name . '</strong> cannot be null', 2104 ) );
+							throw( new ModelException( 'Field <strong>' . $col->name . '</strong> cannot be null', 0x2014 ) );
 						}
 					}
 
@@ -539,7 +544,7 @@
 				} else {
 
 					//Se der erro na hora de salvar, joga um erro para o nivel de cima
-					throw( new ModelException( "Error while saving - " . $sql, 2105 ) );
+					throw( new ModelException( "Error while saving - " . $sql, 0x2015 ) );
 
 				}
 

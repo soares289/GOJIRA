@@ -8,18 +8,26 @@
 
 			function __construct1( $globals ){
 
-				$this->globals     = $globals;
-            $class             = substr( get_class( $this ), 0, -11 );
+				$this->globals = $globals;
+            $class         = substr( get_class( $this ), 0, -11 );
 
             //Se o model não existir, gera um exception, mas nesse instante, isso é previsto
             //por isso não deve deixar ele passar daqui.
             try{
-               $this->model       = Model::Load( $class , $globals );
+               $this->model = Model::Load( $class , $globals );
 				} catch( Exception $e ){
                $this->model = new AppModel( $globals );
             }
 
-			}
+         }
+         
+         //Construtor alternativo que recebe um model pré-instanciado
+         function __construct2( $globals, $model ){
+
+            $this->globals = $globals;
+            $this->model   = $model;
+
+         }
 
 
 			//Instancia um controller a parte
@@ -30,7 +38,7 @@
             }
 
             $file    = strtolower($class) . '.php';
-				$class   = strtoupper( substr( $class, 0, 1 ) ) . substr( $class, 1 ) . '_Controller';
+				$class   = ucfirst( $class ) . '_Controller';
 				$dir     = $globals->environment->controllerPath;
 
 				//Se localizar o arquivo no disco

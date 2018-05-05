@@ -86,7 +86,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
             
 				if( !$this->conn->exist( $this->table, $this->prefix . "login", $login, "typecod in " . $type ) ){
 					if( !$this->useEmail || !$this->conn->exist( $this->table, $this->prefix . "email", $login, "typecod in " . $type ) )
-								throw( new Exception( LGN_LOGIN_INVALID, 9001 ) );
+								throw( new Exception( LGN_LOGIN_INVALID, 0x9001 ) );
 				}
 				
 				
@@ -113,12 +113,12 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 
 				//Verifica se o usuário está ativo
 				if( ! $row[ 'active' ] ){
-					throw( new Exception( LGN_INATIVE, 9002 ) );
+					throw( new Exception( LGN_INATIVE, 0x9002 ) );
 				}
 				
 				//Verifica se o password está correto
 				if( $pwd != $row[ 'pwd' ] ){
-					throw( new Exception( LGN_PASS_INVALID, 9003 ) );
+					throw( new Exception( LGN_PASS_INVALID, 0x9003 ) );
 				}
 				
 				
