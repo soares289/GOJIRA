@@ -388,7 +388,7 @@
 
 				if( $this->count( $sql ) > 0 ){
                $query = $this->query( $sql );
-               $data  = $this->makeDataObject( $query, false, $primary );
+               $data  = $this->makeDataObject( $query, false/*, $primary*/ );
 				}
 
 				return $data;
@@ -594,9 +594,22 @@
 				} elseif( is_array( $key ) ){
 
                $c = 0;
-               foreach( $key as $a ){
-                  if( $c < count( $primary ) )
-                     $where .= (strlen( $where ) <= 0 ? '' : ' AND ') . $primary[ $c ] . '="' . $a . '"';
+               foreach( $key as $i => $a ){
+
+                  if( is_string( $i ) ){
+                     $tmp .=  '`' . $i . '` = "' . $a . '"';
+
+                  } elseif( isset( $primary[ $i ] ) ) {
+                     $tmp .= '`' . $primary[ $i ] . '` = "' . $a . '"';
+
+                  } elseif( $c < count( $primary ) ){
+                     $tmp .= $primary[ $c ] . '="' . $a . '"';
+                  }
+
+                  if( !empty( $tmp ) ){
+                     $where .= (empty( $where ) ? '' : ' AND ') . $tmp;
+                  }
+
                   $c++;
                }
 
