@@ -45,9 +45,7 @@
 
             }
 
-            //Finaliza a conexão
-            //$globals->conn->disconnect();
-
+         
          //Se der erro em alguma coisa, faz com que todos fiquem sabendo
          } catch( ControllerException $e ){
             
@@ -98,8 +96,6 @@
             }
          }
          
-         //Finaliza a conexão
-         $globals->conn->disconnect();
       }
       
       
