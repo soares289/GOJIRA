@@ -50,11 +50,57 @@
 
          //Se der erro em alguma coisa, faz com que todos fiquem sabendo
          } catch( ControllerException $e ){
-
-            die( $e->getMessage() . ' in line <strong>' . $e->getLine() . '</strong>' );
             
-            //Finaliza a conexão
-            $globals->conn->disconnect();
+            if( Controller::Exists('Error') ){
+               
+               $error = Controller::Load( 'Error' );
+               $param['class'] = $class;
+               $param['proc']  = $proc;
+               
+               switch( $e->getCode() ){
+                  case 0x1001:
+                  case 0x1011:
+                     if( method_exists( $error, 'error_404' ) ){
+                        Engine::Render( 'Error', 'error_404', $param );
+                        exit;
+                     }
+                     break;
+                  case 0x1012:
+                     if( method_exists( $error, 'error_403' ) ){
+                        Engine::Render( 'Error', 'error_403', $param );
+                        exit;
+                     }
+                     break;
+                  case 0x1002:
+                     if( method_exists( $error, 'error_500' ) ){
+                        Engine::Render( 'Error', 'error_500', $param );
+                        exit;
+                     }
+                     break;
+                  default:
+                     die( $e->getMessage() . ' in line <strong>' . $e->getLine() . '</strong>' );
+               }
+            }
+            
+         } catch( Exception $e ){
+            
+            if( Controller::Exists('Error') ){
+               
+               $error = Controller::Load( 'Error' );
+               $param['class'] = $class;
+               $param['proc']  = $proc;
+               
+               if( method_exists( $error, 'error_500' ) ){
+                  Engine::Render( 'Error', 'error_500', $param );
+               } else {
+                  die( $e->getMessage() . ' in line <strong>' . $e->getLine() . '</strong>' );
+               }
+            }
          }
+         
+         //Finaliza a conexão
+         $globals->conn->disconnect();
       }
+      
+      
    }

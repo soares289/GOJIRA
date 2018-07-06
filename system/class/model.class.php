@@ -86,6 +86,29 @@
 				}
 
 			}
+         
+         
+         //Verifica se um Model existe
+         static function Exists( $class ){
+            
+            $ret     = false;
+            $globals = $GLOBALS['globals'];
+            $file    = strtolower($class) . '.php';
+				$class   = ucfirst( $class ) . '_Model';
+				$dir     = $globals->environment->modelPath;
+            
+            //Se localizar o arquivo no disco
+				if( file_exists(  $dir . $file ) ){
+
+               require_once( $dir . $file );
+               
+               if( class_exists( $class ) ){
+                  $ret = true;
+               }
+            }
+            
+            return $ret;
+         }
 
 
 			//Adiciona um campo na consulta SQL

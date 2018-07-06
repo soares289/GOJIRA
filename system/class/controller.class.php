@@ -46,9 +46,15 @@
 
                //Instancia o objeto
 					require_once( $dir . $file );
-					$objController = new $class( $globals );
-               return $objController;
-
+               
+               if( class_exists( $class ) ){
+                  $objController = new $class( $globals );
+                  return $objController;
+               
+               } else {
+                  //Classe declarada errada
+                  throw( new ControllerException( "Wrong class declaration for controller <strong>\"" . $class . "\"</strong> in <strong>\"" . $dir . $file . "\"</strong>", 0x1002 ) );
+               }
             } else {
 					//Controller não localizado no disco
 					throw( new ControllerException( "Controller <strong>\"" . $class . "\"</strong> not found in <strong>\"" . $dir . $file . "\"</strong>", 0x1001 ) );
@@ -72,24 +78,49 @@
 
                   //Retorna o resultado da função dentro do model
                   if( $objController->beforeCall( $class, $method, $param) !== false ){
-                     return call_user_func_array( array( $objController, $method), array( $param ));
-
+                     $ret = call_user_func_array( array( $objController, $method), array( $param ));
+                     return $ret;
+                     
                   } else {
                      //Execução não altorizada
-						   throw( new ControllerException( "Unauthorized execution for method <strong>\"" . $method . "\"</strong> in Controller Object <strong>\"" . $class . "\"</strong>", 0x1002 ) );
+						   throw( new ControllerException( "Unauthorized execution for method <strong>\"" . $method . "\"</strong> in Controller Object <strong>\"" . $class . "\"</strong>", 0x1012 ) );
                   }
 
 					} else {
 
-						//Metodo não localizado dentro do model
-						throw( new ControllerException( "Method <strong>\"" . $method . "\"</strong> not found in Controller Object <strong>\"" . $class . "\"</strong>", 0x1001 ) );
+						//Metodo não localizado dentro do controller
+						throw( new ControllerException( "Method <strong>\"" . $method . "\"</strong> not found in Controller Object <strong>\"" . $class . "\"</strong>", 0x1011 ) );
 					}
 
 
 
          }
          
-
+         
+         //Verifica se um controller existe
+         static function Exists( $class ){
+            
+            $ret     = false;
+            $globals = $GLOBALS['globals'];
+            $file    = strtolower($class) . '.php';
+				$class   = ucfirst( $class ) . '_Controller';
+				$dir     = $globals->environment->controllerPath;
+            
+            //Se localizar o arquivo no disco
+				if( file_exists(  $dir . $file ) ){
+               
+               require_once( $dir . $file );
+            
+               if( class_exists( $class ) ){
+                  $ret = true;
+               }
+            }
+            
+            return $ret;
+            
+         }
+            
+         
          //Executa antes do método chamado ser executado
          function beforeCall( $class, $method, $param ){
             return true;
