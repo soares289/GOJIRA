@@ -59,6 +59,7 @@
                   case 0x1001:
                   case 0x1011:
                      if( method_exists( $error, 'error_404' ) ){
+                        header("HTTP/1.0 404 Not Found");
                         Engine::Render( 'Error', 'error_404', $param );
                         exit;
                      }
@@ -71,6 +72,7 @@
                      break;
                   case 0x1002:
                      if( method_exists( $error, 'error_500' ) ){
+                        header('HTTP/1.1 500 Internal Server Error');
                         Engine::Render( 'Error', 'error_500', $param );
                         exit;
                      }
@@ -88,6 +90,7 @@
                $param['class'] = $class;
                $param['proc']  = $proc;
                
+               header('HTTP/1.1 500 Internal Server Error');
                if( method_exists( $error, 'error_500' ) ){
                   Engine::Render( 'Error', 'error_500', $param );
                } else {
