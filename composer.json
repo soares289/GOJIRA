@@ -3,7 +3,6 @@
    "description": "Framework baseado no padrão MVC para simples e rapido desenvolvimento de aplicações WEB",
    "homepage": "https://github.com/soares289/GOJIRA",
    "license": "OSL-3.0",
-   "version": "0.9.1",
    "keywords": ["GOJIRA", "MVC", "Framework","PHP","MySQL"],
    "minimum-stability": "dev",
    "authors": [
@@ -14,5 +13,15 @@
    ],
    "require": {
       "php": ">=7.0.0"
+   },
+   "scripts":{
+      "post-install-cmd": [
+         "rm -rf dist",
+         "rmdir /S /Q dist"
+      ],
+      "post-update-cmd": [
+         "rm -rf dist",
+         "rmdir /S /Q dist"
+      ]
    }
 }
