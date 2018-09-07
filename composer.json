@@ -13,15 +13,5 @@
    ],
    "require": {
       "php": ">=7.0.0"
-   },
-   "scripts":{
-      "post-install-cmd": [
-         "rm -rf dist",
-         "rmdir /S /Q dist"
-      ],
-      "post-update-cmd": [
-         "rm -rf dist",
-         "rmdir /S /Q dist"
-      ]
    }
 }

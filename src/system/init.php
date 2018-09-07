@@ -78,33 +78,38 @@
 
       $protocol = 'http' . (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on" ? 's' : '');
 
-      //Dados referentes ao environment do sistema
+      //Dados referentes ao environment do sistema - Paths e Urls
 
-      /* Urls base */
+      /* Protocolo atual */
       $globals->environment->protocol         = $protocol;
+      
+      //Base do sistema
       $globals->environment->absPath          = $absPath;
       $globals->environment->baseUrl          = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL'      , $baseURL );
+
+      //webroot / acessivel pela url
       $globals->environment->rootUrl          = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_URL'      , $baseURL . 'webroot/' );
-      $globals->environment->systemUrl        = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'SYSTEM_URL'    , $systemURL);
-      $globals->environment->systemPluginUrl  = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'PLUGIN_URL'    , $systemURL . 'plugin/');
       $globals->environment->rootPath         = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_DIR'      , 'webroot/');
-      
-      /* Paths do sistema */
-      $globals->environment->systemPath       = $systemPath;
-      $globals->environment->systemLibPath    = $systemPath . 'lib/';
-      $globals->environment->systemIncPath    = $systemPath . 'inc/';
-      $globals->environment->systemVendorPath = $systemPath . 'vendor/';
-      $globals->environment->systemPluginPath = $systemPath . 'plugin/';
-      
-      /* Paths do core */
+
+      /* Core do sistema */
       $globals->environment->corePath         = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'CORE_DIR'      , 'core/');
       $globals->environment->viewPath         = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VIEW_DIR'      , 'core/view/');
       $globals->environment->controllerPath   = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'CONTROLLER_DIR', 'core/controller/');
       $globals->environment->modelPath        = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'MODEL_DIR'     , 'core/model/');
       $globals->environment->includePath      = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'INCLUDE_DIR'   , 'core/inc/');
-      $globals->environment->vendorPath       = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VENDOR_DIR'    , 'core/vendor/');
       $globals->environment->libPath          = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'LIB_DIR'       , 'core/lib/');
 
+      /* Vendors */
+      $globals->environment->vendorUrl        = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VENDOR_URL', $baseURL . 'vendor/' );
+      $globals->environment->vendorPath       = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VENDOR_DIR', 'vendor/');
+      
+      /* Gojira */
+      $globals->environment->systemUrl        = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'SYSTEM_URL'    , $systemURL);
+      $globals->environment->systemPath       = $systemPath;
+
+      $globals->environment->systemIncPath    = $systemPath . 'inc/';
+      $globals->environment->systemVendorPath = $systemPath . 'vendor/';
+      
       //Módulo de componentes
       $globals->environment->componentPath           = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'COMPONENT_DIR' , 'component/');
       $globals->environment->componentModelPath      = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'COMPONENT_MODEL_DIR' , 'component/model/');

@@ -12,20 +12,11 @@
       if( file_exists( $env->vendorPath . $className . '.php' ) ){
          require_once( $env->vendorPath . $className . '.php' );
          
-      } elseif( file_exists( $env->libPath . $className . '.php' ) ){
-         require_once( $env->libPath . $className . '.php' );
-         
-      } elseif( file_exists( $env->includePath . $className . '.php' ) ){
-         require_once( $env->includePath . $className . '.php' );
-         
-      } elseif( file_exists( $env->systemLibPath . $className . '.php' ) ){
-         require_once( $env->systemLibPath . $className . '.php' );
-         
       } elseif( file_exists( $env->systemIncPath . $className . '.php' ) ){
          require_once( $env->systemIncPath . $className . '.php' );
          
-      } elseif( file_exists( $env->systemPluginPath . $className . '.php' ) ){
-         require_once( $env->systemPluginPath . $className . '.php' );
+      } elseif( file_exists( $env->systemVendorPath . $className . '.php' ) ){
+         require_once( $env->systemVendorPath . $className . '.php' );
          
       } elseif( ! $lRec ){
          helper_loader( strtolower( $className ), true );
