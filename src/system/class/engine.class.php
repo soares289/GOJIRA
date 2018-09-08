@@ -78,10 +78,9 @@
                      }
                      break;
                   default:
-                     die( $e->getMessage() . ' in line <strong>' . $e->getLine() . '</strong>' );
+                     throw( $e );
                }
             }
-            
          } catch( Exception $e ){
             
             if( Controller::Exists('Error') ){
@@ -96,6 +95,8 @@
                } else {
                   die( $e->getMessage() . ' in line <strong>' . $e->getLine() . '</strong>' );
                }
+            } else {
+               throw( $e );
             }
          }
          
