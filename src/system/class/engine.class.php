@@ -78,9 +78,17 @@
                      }
                      break;
                   default:
-                     throw( $e );
+                     if( method_exists( $error, 'error_unknow' ) ){
+                        Engine::Render( 'Error', 'error_unknow', $param );
+                        exit;
+                     } else {
+                        throw( $e );
+                     }
                }
+            } else {
+               throw( $e );
             }
+
          } catch( Exception $e ){
             
             if( Controller::Exists('Error') ){
@@ -92,8 +100,10 @@
                header('HTTP/1.1 500 Internal Server Error');
                if( method_exists( $error, 'error_500' ) ){
                   Engine::Render( 'Error', 'error_500', $param );
+               } elseif( method_exists( $error, 'error_unknow' ) ){
+                  Engine::Render( 'Error', 'error_unknow', $param );
                } else {
-                  die( $e->getMessage() . ' in line <strong>' . $e->getLine() . '</strong>' );
+                  throw( $e );
                }
             } else {
                throw( $e );
