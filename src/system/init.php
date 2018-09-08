@@ -122,7 +122,7 @@
 
       //Configura o smarty
       $globals->smarty->setTemplateDir( $globals->environment->viewPath );
-      $globals->smarty->caching = TPL_CACHE;
+      $globals->smarty->caching = Smarty::CACHING_OFF;
 
       //Adiciona o controle de helpers (autoload)
       require_once( $globals->environment->systemIncPath . 'helpers.php' );
