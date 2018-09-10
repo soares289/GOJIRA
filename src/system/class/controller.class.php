@@ -63,47 +63,45 @@
 
          }
 
-			//Executa um método dentro do model
+			//Executa um método dentro do controller
 			static function Call( $class, $method, $param, $globals = ''){
 
 
-               if( $globals == '' ){
-                  $globals = $GLOBALS['globals'];
-               }
-               
-               $objController = Controller::Load( $class, $globals );
+            if( $globals == '' ){
+               $globals = $GLOBALS['globals'];
+            }
 
-               //Se o metodo existir
-					if( method_exists( $objController, $method ) ){
+            $ret           = '';
+            $objController = Controller::Load( $class, $globals );
 
-                  //Retorna o resultado da função dentro do model
-                  if( $objController->beforeCall( $class, $method, $param) !== false ){
-                     $ret = call_user_func_array( array( $objController, $method), array( $param ));
-                     return $ret;
-                     
-                  } else {
+            //Se o metodo existir
+            if( method_exists( $objController, $method ) ){
 
-                     if( method_exists( $objController, 'unauthorized' ) ){
-                        $ret = call_user_func_array( array( $objController, 'unauthorized'), array( $method, $param ));
-                        return $ret;
-
-                     } else {
-                        //Execução não altorizada
-                        throw( new ControllerException( "Unauthorized execution for method <strong>\"" . $method . "\"</strong> in Controller Object <strong>\"" . $class . "\"</strong>", 0x1012 ) );
-                        
-                     }
-                  }
-
-					} elseif( method_exists( $objController, 'not_found')  ) {
-                  $ret = call_user_func_array( array( $objController, 'not_found'), array( $method, $param ));
-                  return $ret;
+               //Retorna o resultado da função dentro do model
+               if( $objController->beforeCall( $class, $method, $param) !== false ){
+                  $ret = call_user_func_array( array( $objController, $method), array( $param ));
                   
                } else {
-						//Metodo não localizado dentro do controller
-						throw( new ControllerException( "Method <strong>\"" . $method . "\"</strong> not found in Controller Object <strong>\"" . $class . "\"</strong>", 0x1011 ) );
-					}
 
+                  if( method_exists( $objController, 'unauthorized' ) ){
+                     $ret = call_user_func_array( array( $objController, 'unauthorized'), array( $method, $param ));
+            
+                  } else {
+                     //Execução não altorizada
+                     throw( new ControllerException( "Unauthorized execution for method <strong>\"" . $method . "\"</strong> in Controller Object <strong>\"" . $class . "\"</strong>", 0x1012 ) );
+                     
+                  }
+               }
 
+            } elseif( method_exists( $objController, 'not_found')  ) {
+               $ret = call_user_func_array( array( $objController, 'not_found'), array( $method, $param ));
+               
+            } else {
+               //Metodo não localizado dentro do controller
+               throw( new ControllerException( "Method <strong>\"" . $method . "\"</strong> not found in Controller Object <strong>\"" . $class . "\"</strong>", 0x1011 ) );
+            }
+
+            return $ret;
 
          }
          

@@ -164,7 +164,8 @@
 							  $a[0] . (empty( $a[1] ) ? '' : ' AS "' . $a[1] . '"');
 				}
 
-				$sql .= ' FROM ' . (isset( $obj->sql['table'] ) ? '`' . $obj->sql['table'] . '`' : '`' . $obj->table . '`') . ' as a';
+            $table = (isset( $obj->sql['table'] ) ? $obj->sql['table'] : $obj->table);
+				$sql .= ' FROM ' . (is_object( $table ) ? '(' . $this->makeCommand($table) . ')' : '`' . $table . '`') . ' as a';
 
 				//parte dos joins
 				if( isset( $obj->sql[ 'join' ] ) && count( $obj->sql[ 'join' ] ) > 0 ){
@@ -184,7 +185,8 @@
 				if( isset( $obj->sql['where'] ) && count( $obj->sql['where'] ) > 0 ){
 					$sql .= ' WHERE ';
 					foreach( $obj->sql['where'] as $a ){
-						$sql .= $a[0] . ' ' . $a[1] . ' ' . $a[2] . (count( $a ) > 3 ? ' ' . $a[3] . ' ' : '');
+                  $sql .= $a[0] . ' ' . $a[1] . ' ' . (is_object($a[2]) ? '(' . $this->makeCommand($a[2]) . ')' : $a[2]) .
+                              (count( $a ) > 3 ? ' ' . $a[3] . ' ' : '');
 					}
 				}
 
