@@ -367,7 +367,7 @@
 
 
 			//Busca um registro(ou um range de registro) da tabela atual
-			function getData( $key = '', $sort = '', $limit = '' ){
+			function getData( $key = '', $sort = '', $limit = '', $usePrimary = false ){
 
 				$this->updateTableInfo();
 
@@ -420,7 +420,7 @@
 
 				if( $this->count( $sql ) > 0 ){
                $query = $this->query( $sql );
-               $data  = $this->makeDataObject( $query, false/*, $primary*/ );
+               $data  = $this->makeDataObject( $query, false, ($usePrimary ? $primary : null) );
 				}
 
 				return $data;
