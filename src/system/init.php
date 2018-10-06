@@ -34,7 +34,6 @@
       require_once( $systemPath . 'class/tool.class.php' );
       require_once( $systemPath . 'class/connection.class.php' );
       require_once( $systemPath . 'class/config.class.php' );
-      require_once( $systemPath . 'class/log.class.php' );
       require_once( $systemPath . 'class/login.class.php' );
       require_once( $systemPath . 'class/component.class.php' );
       require_once( $systemPath . 'class/controller.class.php' );

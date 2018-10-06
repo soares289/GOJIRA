@@ -4,16 +4,14 @@ define( 'LGN_LOGIN_INVALID', "Login inválido!");
 define( 'LGN_INATIVE'      , "Conta não ativada!");
 define( 'LGN_PASS_INVALID' , "Senha errada!");
 
-define( 'LGN_DEFAULT_TABLE'     , 'user' );
-define( 'LGN_DEFAULT_PREFIX'    , 'usr' );
-define( 'LGN_USE_EMAIL'         , true );
-define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
+define( 'LGN_DEFAULT_USER_TABLE' , 'user' );
+define( 'LGN_DEFAULT_TYPE_TABLE' , 'user_type' );
+define( 'LGN_USE_EMAIL'          , true );
+define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 
 //TODO - Permitir USAR ou NÃO USAR USER_TYPE
 //TODO - Permitir configurar a tabela para o USER_TYPE
-//TODO - Colocar o codigo do erro em constantes também
-
-	require_once( "log.class.php" );
+//TODO - Permitir configurar os campos da tabela
 
 		class Login extends GojiraCore{
 			
@@ -22,8 +20,8 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 			private $tools;
 			private $id;
 			
-			private $table     = LGN_DEFAULT_TABLE;
-			private $prefix    = LGN_DEFAULT_PREFIX;
+         private $userTable = LGN_DEFAULT_USER_TABLE;
+         private $typeTable = LGN_DEFAULT_TYPE_TABLE;
 			private $useEmail  = LGN_USE_EMAIL;
 			
          private $useCookie = false;
@@ -50,26 +48,26 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 			}
 			
 			//Constructor com 4 parametros
-			function __construct4( $conn, $tools, $table, $prefix ){
+			function __construct4( $conn, $tools, $userTable, $typeTable ){
 				
 				$this->conn   = $conn;
 				$this->tools  = $tools;
 				
-				$this->table  = $table;
-				$this->prefix = $prefix;
+				$this->userTable = $userTable;
+				$this->typeTable = $typeTable;
 				
 			}
 
 			
 			
-			function get_table(){ return $this->table; }
-			function get_prefix(){ return $this->prefix; }
+         function get_userTable(){ return $this->userTable; }
+         function get_typeTable(){ return $this->typeTable; }
 			function get_useEmail(){ return $this->useEmail; }
 
-			function config($table, $prefix){
+			function configure($userTable, $typeTable){
 
-				$this->table = $table;
-				$this->prefix = $prefix; 
+				$this->userTable = $userTable;
+				$this->typeTable = $typeTable;
 
 			}
 			
@@ -82,34 +80,33 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 				$type  = $this->tools->antiInjection( $type );
 				$type  = $this->getType( $type );
 
-				//Verifica se o usuario é valido
-            
-				if( !$this->conn->exist( $this->table, $this->prefix . "login", $login, "typecod in " . $type ) ){
-					if( !$this->useEmail || !$this->conn->exist( $this->table, $this->prefix . "email", $login, "typecod in " . $type ) )
+				//Verifica se o usuario é valido (pelo campo login e, se useEmail, pelo campo email)
+				if( !$this->conn->exist( $this->userTable, "login", $login, "type in " . $type ) ){
+					if( !$this->useEmail || !$this->conn->exist( $this->userTable, "email", $login, "type in " . $type ) )
 								throw( new Exception( LGN_LOGIN_INVALID, 0x9001 ) );
 				}
 				
 				
 				//Monta a sentença SQL para verificar se o usuário existe
-				$sql   = 'SELECT b.typesmall as type, ' . 
-                            'b.typecod as type_cod, ' . 
-									 'a.' . $this->prefix . 'cod as code, ' .
-				   				 'a.' . $this->prefix . 'pwd as pwd, ' .
-									 'a.' . $this->prefix . 'login as login, ' .
-									 'a.' . $this->prefix . 'email as email, ' .
-									 'a.' . $this->prefix . 'active as active, ' .
-							($this->conn->fieldExist( $this->table, $this->prefix . 'name' ) ? 
-									 'a.' . $this->prefix . 'name as name ' : '"" as name ') .
-							' FROM ' . 
-								$this->table . ' as a inner join user_type as b on a.typecod = b.typecod ' .
-										'where (a.' . $this->prefix . 'login = "' . $login . '" ' . 
-				  ($this->useEmail ? ' or a.' . $this->prefix . 'email = "' . $login . '"' : '') .
-				  					') and a.' . 'typecod in ' . $type . ' limit 1';
+				$sql   = 'SELECT b.shortcode AS type, ' . 
+                            'b.id AS type_cod, ' . 
+									 'a.id AS code, ' .
+				   				 'a.password AS pwd, ' .
+									 'a.login AS login, ' .
+									 'a.email AS email, ' .
+									 'a.active AS active, ' .
+							($this->conn->fieldExist( $this->userTable, 'name' ) ? 
+									 'a.name AS name ' : '"" AS name ') .
+                     ' FROM ' . $this->userTable . ' AS a ' . 
+                        'INNER JOIN ' . $this->typeTable . ' AS b ON a.type = b.id ' .
+										'where (a.login = "' . $login . '" ' . 
+				  ($this->useEmail ? ' or a.email = "' . $login . '"' : '') .
+				  					') and a.' . 'type in ' . $type . ' limit 1';
 				
             
 				$query = $this->conn->query( $sql );
 				$row   = $this->conn->fetch( $query );
-				if( strlen( $pwd ) != 128 ) $pwd   = $this->toPassword( $pwd );
+				if( strlen( $pwd ) != 128 ) $pwd = $this->toPassword( $pwd );
 
 				//Verifica se o usuário está ativo
 				if( ! $row[ 'active' ] ){
@@ -124,13 +121,13 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 				
 				//Salva a sessão
             if( $this->useCookie ){
-               setcookie( strtolower($row['type']) . "logged" , true, time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "cod"    , $row['code'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "login"  , $row['login'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "email"  , $row['email'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "name"   , $row['name'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "type"   , $row['type'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "typecod", $row['type_cod'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "Logged" , true, time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "Cod"    , $row['code'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "Login"  , $row['login'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "Email"  , $row['email'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "Name"   , $row['name'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "Type"   , $row['type'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "TypeCod", $row['type_cod'], time() + LGN_COOKIE_EXPIRE_TIME);
                
             } else {
                $_SESSION[ $row['type'] . "Logged"]  = true;
@@ -142,10 +139,6 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
                $_SESSION[ $row['type'] . "TypeCod"] = $row['type_cod'];
 				}
             
-				//Loga o login
-				$log = new Log( $this->conn, $this->tools );
-				$log->add("LOGIN","LOGON","user",$row['code'],$row['code'],'Logado com sucesso');
-				
 				return $row['code'];
 				
 			}
@@ -153,18 +146,16 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 			
 			
 			//Remove a sessão do usuario logado
-			function logoff( $type ){
+			function logout( $type ){
 
 				if( $this->isLogged( $type ) ){
 
 					//Loga a saida do sistema
 					$usr = $this->getLogged( 'Cod', $type );
-					$log = new Log( $this->conn, $this->tools );
-					$log->add("LOGIN","LOGOFF","user",$usr,$usr,'Saindo do sistema');
 					
 					$type   = $this->getType( $type, true );
 					$type   = explode( ',', strtoupper( $type ) );
-               $fields = array('Logged', 'Cod', 'Name', 'Login', 'Email', 'Type', 'Typecod');
+               $fields = ['Logged', 'Cod', 'Name', 'Login', 'Email', 'Type', 'Typecod'];
 					//Desloga todos os tipos de usuários informados
 					foreach( $type as $a ){
 						
@@ -207,16 +198,16 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 			
 			
 			//Busca qual o tipo de usuário logado.
-			//Retorno pode ser 1 = TypeSmall, 2 - TypeCod, 3 - TypeName
+			//Retorno pode ser 1 = SHORTCODE, 2 - ID, 3 - NAME
 			function loggedType( $type, $return = 1 ){
 				
 				//Converte o tipo para o formato certo ou busca ele da db caso não seja informado
 				if( empty( $types ) ){
 					
-					$query = $this->conn->query( 'select typesmall from user_type' );
+					$query = $this->conn->query( 'SELECT shortcode FROM ' . $this->typeTable );
 					$type = array();
 					while( $row = $this->conn->fetch( $query ) ){
-						$type[] = $row['typesmall'];
+						$type[] = $row['shortcode'];
 					}
 					
 				} else {
@@ -231,7 +222,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 						if( $return == 1 ){
 							return strtoupper( $a );
 						} else {
-							$sql = 'select ' . ($return == 2 ? 'typecod as a' : 'typename as a' ) . ' from user_type where typesmall = "' . $a . '"';
+							$sql = 'SELECT ' . ($return == 2 ? 'id AS a' : 'name AS a' ) . ' FROM ' . $this->typeTable . ' WHERE shortcode = "' . $a . '"';
 							$row = $this->conn->fetch( $this->conn->query( $sql ) );
 							return $row[ 'a' ];
 						}
@@ -248,10 +239,10 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 				
 				if( empty( $type ) ){
 					
-					$query = $this->conn->query( 'select typesmall from user_type' );
-					$type = array();
+					$query = $this->conn->query( 'SELECT shortcode from ' . $this->typeTable );
+					$type = [];
 					while( $row = $this->conn->fetch( $query ) ){
-						$type[] = $row['typesmall'];
+						$type[] = $row['shortcode'];
 					}
 					
 				} else {
@@ -277,7 +268,8 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 				
 				return '';
 			}
-			
+         
+         
 			//Verifica se o usuario está logado
 		   function isLogged( $type ){
 				
@@ -301,7 +293,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
                            
                         $typeCod = $this->getType( $a );
 
-                        if( $this->conn->exist( $this->table, $this->prefix . 'cod', $_COOKIE[ $a . 'cod'], "typecod in " . $typeCod . ' and ' . $this->prefix . 'active' ) ){
+                        if( $this->conn->exist( $this->userTable, 'id', $_COOKIE[ $a . 'Cod'], "type IN " . $typeCod . ' AND active' ) ){
                            $n++;
                         }
                      }
@@ -320,7 +312,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
                            
                         $typeCod = $this->getType( $a );
 
-                        if( $this->conn->exist( $this->table, $this->prefix . 'cod', $_SESSION[ $a . 'Cod'], "typecod in " . $typeCod . ' and ' . $this->prefix . 'active' ) ){
+                        if( $this->conn->exist( $this->userTable, 'id', $_SESSION[ $a . 'Cod'], "type IN " . $typeCod . ' AND active' ) ){
                            $n++;
                         }
                      }
@@ -422,7 +414,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 			function getType( $type, $useSmall = false ){
 				
 				$ret   = '';
-				$table = 'user_type';
+				$table = $this->typeTable;
 				$where = '';
 				
 				if( $this->conn->tableExist( $table ) ){
@@ -432,8 +424,8 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 						$where .= (empty( $where ) ? '' : ',') . '"' . $a . '"'; 
 					}
 					
-					$sql   = 'select typecod as cod, typesmall as small from ' . $table .
-									' where typecod in (' . $where . ') or typesmall in (' . $where . ') or typename in (' . $where . ')';
+					$sql   = 'SELECT id AS cod, shortcode AS small FROM ' . $table .
+									' WHERE id IN (' . $where . ') OR shortcode IN (' . $where . ') OR name IN (' . $where . ')';
 					
 					$query = $this->conn->query( $sql );
 					while( $row = $this->conn->fetch( $query ) ){
@@ -468,18 +460,14 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 				
 				$type = $this->getType( $type );
 				if(is_numeric($user)){
-					$sql 	= "SELECT " . $this->prefix . "email AS email," . $this->prefix . "cod AS cod,COUNT(*) AS numUser FROM " . $this->table . " WHERE " . $this->prefix . "cod = '" . $user . "' and typecod in " . $type . ";";
+					$sql 	= "SELECT email AS email, id AS cod, COUNT(*) AS numUser FROM " . $this->userTable . " WHERE id = '" . $user . "' AND type in " . $type;
 				}else{
-					$sql 	= "SELECT " . $this->prefix . "email AS email," . $this->prefix . "cod AS cod,COUNT(*) AS numUser FROM " . $this->table . " WHERE " . $this->prefix . "login = '" . $user . "' OR " . $this->prefix . "email = '" . $user . "' and typecod in " . $type . ";";
+					$sql 	= "SELECT email AS email, id AS cod, COUNT(*) AS numUser FROM " . $this->userTable . " WHERE (login = '" . $user . "' OR email = '" . $user . "') AND typecod IN " . $type;
 				}
 				$ret 	= $this->conn->fetch($this->conn->query($sql));
-				return(array(
-				
-								"exists" => $ret['numUser'] ? 1 : 0,
-								"cod"		=> $ret['cod'],
-								"email" 	=> $ret['email']
-							
-							));
+				return [	"exists" => ($ret['numUser'] ? 1 : 0),
+							"cod"		=> $ret['cod'],
+							"email" 	=> $ret['email'] ];
 				
 			}
 			
@@ -488,10 +476,11 @@ define( 'LGN_COOKIE_EXPIRE_TIME', 1800);
 			function changePass( $userId , $pass ){
 				
 				$cryptPass 	= $this->toPassword($pass);
-				$sql  = "UPDATE " . $this->table . " SET " . $this->prefix . "pwd = '" . $cryptPass . "' WHERE " . $this->prefix . "cod = " . $userId . " LIMIT 1";
+				$sql  = "UPDATE " . $this->userTable . " SET password = '" . $cryptPass . "' WHERE id = " . $userId . " LIMIT 1";
 				return ($this->conn->query($sql));
 				
-			}
+         }
+         
 			
          //Seta a propriedade useCookie
          function setCookie( $val ){

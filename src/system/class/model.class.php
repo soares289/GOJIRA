@@ -23,13 +23,20 @@
 			//Construtores do objeto
 			function __construct1( $globals ){
 
+            $reserved      = ['Model','AppModel','ComponentModel'];
+            $class         = get_class( $this );
 
-				$this->globals     = $globals;
-            $this->conn        = $this->globals->conn->conn;
-            $this->db          = $this->globals->conn->db;
-            $this->host        = $this->globals->conn->host;
-            $this->table       = strtolower( substr( get_class( $this ), 0, -6) );
-            if( !in_array(get_class( $this ), ['Model','AppModel'] ) ){
+				$this->globals = $globals;
+            $this->conn    = $this->globals->conn->conn;
+            $this->db      = $this->globals->conn->db;
+            $this->host    = $this->globals->conn->host;
+            
+            //Limpa o nome da classe para tentar buscar o nome da tabela
+            $table       = explode('_', $class);
+            $this->table = strtolower( substr( $class, 0, strlen( $class) - strlen(end($table)) -1 ) );
+
+            
+            if( !in_array( $class, $reserved ) ){
                $this->updateTableInfo();
                $this->resetCommand();
             }
