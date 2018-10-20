@@ -54,6 +54,7 @@
                $error = Controller::Load( 'Error' );
                $param['class'] = $class;
                $param['proc']  = $proc;
+               $param['error'] = $e;
                
                switch( $e->getCode() ){
                   case 0x1001:
@@ -102,6 +103,7 @@
                $error = Controller::Load( 'Error' );
                $param['class'] = $class;
                $param['proc']  = $proc;
+               $param['error'] = $e;
                
                header('HTTP/1.1 500 Internal Server Error');
                if( method_exists( $error, 'error_500' ) ){
