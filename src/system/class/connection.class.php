@@ -196,6 +196,10 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          //Carrega uma linha do resultSet
          function fetch( $query, $type = MYSQLI_ASSOC){
             
+            if( ! is_object( $query ) ){
+               throw( new Exception('Invalid query object'));
+            }
+            
             if( $type == $this->FETCH_OBJECT ){
                $row = $query->fetch_object();
             } else {
