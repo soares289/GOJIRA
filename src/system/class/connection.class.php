@@ -147,7 +147,11 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
             if( !$this->isConnected() ) $this->reconnect();
                
             $query = $this->conn->query( $sql );
-               
+            
+            if( !is_object($query) && $query === false ){
+               throw( new Exception('Invalid sql statement supplied for connection query') );
+            }
+
             return $query;
          }
 
