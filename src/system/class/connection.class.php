@@ -58,7 +58,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
         
          /***   Metodos de SET e GET de valores ***/
          function get_conn() {        return $this->conn; }
-         function get_connected() {   return ($this->conn ? true : false); }
+         function get_connected() {   return $this->isConnected(); }
          function get_msg() {         return $this->msg; }
          function get_lastCommand() { return $this->lastCommand; }
          function get_lastId() {      return mysqli_insert_id( $this->conn ); }
@@ -106,15 +106,28 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          //Seleciona a base de dados ativa da coexão
          function selectDb( $dbName ){
 				
-				$this->db = $dbName;
-            return $this->conn->select_db( $dbName );
+            $this->db = $dbName;
+            $ret      = false;
+
+            if( $this->connected ){
+               $ret = $this->conn->select_db( $dbName );
+            } 
+
+            return $ret;
 				
          }
 
 
          //Desconecta da base de dados
          function disconnect(){
-            return @$this->conn->close();
+            
+            $ret = false;
+
+            if( $this->connected ){
+               $ret = @$this->conn->close();
+            }
+
+            return $ret;
          }
 
 
@@ -139,13 +152,27 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			}
 
 
+         //Checa se está conectado e gera um erro caso não esteja
+         private function checkConnection(){
+
+            if( !$this->isConnected() ){
+               $this->reconnect();
+               if( !$this->isConnected() ){
+                  throw( new Exception('Cannot connect to the server') );
+               }
+            }
+
+            return true;
+         }
+
+
          //Executa uma consulta no banco de dados
          function query( $sql ){
             
+            $this->checkConnection();
+
             $this->lastCommand = $sql;
             
-            if( !$this->isConnected() ) $this->reconnect();
-               
             $query = $this->conn->query( $sql );
             
             if( !is_object($query) && $query === false ){
@@ -158,13 +185,13 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
          //Executa um comando na base de dados
          function execute( $sql ){
+            
+            $this->checkConnection();
 				
-				$ret = false;
+            $ret = false;
 				
             $this->lastCommand = $sql;
-            
-            if( !$this->isConnected() ) $this->reconnect();
-            
+                        
 				//Executa o comando
             if( $stmt = $this->conn->prepare( $sql ) ){
                return $stmt->execute();
@@ -176,6 +203,8 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
          //Executa uma serie de comandos sql em uma transação
          function secureExec( $sql ){
+            
+            $this->checkConnection();
             
             if( ! is_array( $sql ) ) $sql = array( $sql );
             
@@ -226,6 +255,12 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          //Seleciona o valor mais alto de uma coluna
          function max( $table, $field ){
             
+            if( empty( $table ) || empty( $field ) ){
+               throw( new Exception('Invalid parameters for MAX function') );
+            }
+
+            $this->checkConnection();
+
             $query = $this->query( 'select max(' . $field . ') as a from ' . $table );
             $row = $this->fetch($query);
             return $row['a'];
@@ -236,6 +271,12 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          //Seleciona o valor mais baixo
          function min( $table, $field ){
             
+            if( empty( $table ) || empty( $field ) ){
+               throw( new Exception('Invalid parameters for MIN function') );
+            }
+
+            $this->checkConnection();
+
             $query = $this->query( 'select min(' . $field . ') as a from ' . $table );
             $row = $this->fetch($query);
             return $row['a'];
@@ -249,6 +290,9 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
             $n = false;
             
             if( is_string( $query ) ){
+               
+               $this->checkConnection();
+
                $sql = 'select count(*) as a from (' . $query . ') as a';
                $ret = $this->query( $sql );
                $row = $this->fetch( $ret );
@@ -264,6 +308,12 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          //Verifica se um valor existe em um campo da tabela
          function exist( $table, $column = '', $value = '', $compare = ''){
             
+            if( empty( $table ) ){
+               throw( new Exception('Invalid parameters for EXIST function') );
+            }
+
+            $this->checkConnection();
+
             $sql = '';
 
             if( !empty( $column  ) ) $sql .= $column . ( $compare == 'null' ? ' is null ' : '="' . $value . '" ');
@@ -283,7 +333,13 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			
 			//Verifica se a tabela existe
 			function tableExist( $table ){
-				
+            
+            if( empty( $table ) ){
+               throw( new Exception('Invalid table name') );
+            }
+
+            $this->checkConnection();
+
 				$sql = 'SELECT COUNT(*) AS a FROM information_schema.TABLES WHERE TABLE_SCHEMA="' . $this->db . '" and TABLE_NAME="' . $table . '"';
   				$row = $this->fetch( $this->query( $sql ) );
 
@@ -294,7 +350,13 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			
 			//Verifica se um determinado campo existe na tabela
 			function fieldExist( $table, $field ){
-				
+            
+            if( empty( $table ) || empty( $field ) ){
+               throw( new Exception('Invalid parameters for FIELDEXIST function') );
+            }
+
+            $this->checkConnection();
+
 				$sql = 'select count(*) as a from information_schema.COLUMNS where TABLE_SCHEMA = "' . $this->db . '" and TABLE_NAME="' . $table . '" and COLUMN_NAME="' . $field . '"';
 				$row = $this->fetch( $this->query( $sql ) );
 				
@@ -305,7 +367,13 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
          //Busca um valor de um campo especifico
          function getValue( $table, $field, $compare, $max = 0 ){
-         
+            
+            if( empty( $table ) || empty( $field ) || empty( $compare ) ){
+               throw( new Exception('Invalid parameters for GETVALUE function') );
+            }
+
+            $this->checkConnection();
+
             $ret = array();
             $sql = 'select ' . $field . ' AS a from ' . $table . ' where ' . $compare;
             

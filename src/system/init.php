@@ -57,11 +57,14 @@
       }
 
       //Verifica se tem os dados para conexão
-      $globals->conn = new Connection( $globals->db->host, $globals->db->user, $globals->db->password);
+      if( isset($globals->db->host) && isset($globals->db->user) && isset($globals->db->password) ){
+         $globals->conn = new Connection( $globals->db->host, $globals->db->user, $globals->db->password);
+      } else {
+         $globals->conn = new Connection();
+      }
 
-      //Se conectado
-      if( $globals->conn->connected && !empty( $globals->db->name )){
-         //Seleciona o db configurado
+      //Seleciona o db configurado
+      if( isset( $globals->db->name ) ){
          $globals->conn->selectDb( $globals->db->name );
       }
 

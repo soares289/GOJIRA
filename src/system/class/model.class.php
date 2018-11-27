@@ -51,12 +51,17 @@
 			//propriedades do objeto
 			//$table
 			function set_table( $val ){
-				if( $this->tableExist( $val ) ){
 
-					$this->table = $val;
-					$this->updateTableInfo();
-
-				}
+            if( $this->connected ){
+               if( $this->tableExist( $val ) ){
+                  $this->table = $val;
+                  $this->updateTableInfo();
+               } else {
+                  throw( new ModelException( "Invalid table: <strong>\"" . $val . "\"</strong>", 0x2003 ) );
+               }
+            } else {
+               $this->table = $val;
+            }
 			}
 			function get_table(){ return $this->table; }
 
@@ -237,7 +242,7 @@
 
 			//Reseta o comando
 			function resetCommand(){
-				$this->sql = array( 'field'  => array(), 'where'  => array(), 'order'  => array(), 'group'  => array(), 'having'  => array(), 'join'   => array(), 'limit' => array());
+				$this->sql = [ 'field' => [], 'where' => [], 'order' => [], 'group' => [], 'having' => [], 'join' => [], 'limit' => []];
 			}
 
 
@@ -325,22 +330,23 @@
 			//Atualiza as informações da tabela
 			function updateTableInfo(){
 
-				$sql  =  'SELECT COLUMN_NAME AS `name`, ' .
-							       'COLUMN_DEFAULT as `default`, ' .
-                            'COLUMN_DEFAULT IS NULL as `default_is_null`, ' .
-							       'IS_NULLABLE = "YES" AS `null`, ' .
-							       'DATA_TYPE AS `type`, ' .
-							       'IF(CHARACTER_MAXIMUM_LENGTH IS NULL, NUMERIC_PRECISION, CHARACTER_MAXIMUM_LENGTH) AS `length`, ' .
-							       'IF(CHARACTER_MAXIMUM_LENGTH IS NULL, NUMERIC_SCALE, 0) AS `decimal`, ' .
-							       'COLUMN_KEY = "PRI" AS `primary_key`, ' .
-							       'INSTR(EXTRA,"auto_increment") as `auto_increment`, ' .
-							       'COLUMN_KEY = "PRI" OR COLUMN_KEY = "UNI" as `unique`, ' .
-							       'NOT( COLUMN_KEY = "" OR COLUMN_KEY IS NULL) as `index` ' .
-							   'FROM information_schema.COLUMNS ' .
-							  			'WHERE TABLE_SCHEMA="' . $this->globals->db->name . '" ' .
-										  'AND TABLE_NAME="' . $this->table . '" ORDER BY ORDINAL_POSITION';
-
             if( $this->isConnected() ){
+               $sql  =  'SELECT COLUMN_NAME AS `name`, ' .
+                              'COLUMN_DEFAULT as `default`, ' .
+                              'COLUMN_DEFAULT IS NULL as `default_is_null`, ' .
+                              'IS_NULLABLE = "YES" AS `null`, ' .
+                              'DATA_TYPE AS `type`, ' .
+                              'IF(CHARACTER_MAXIMUM_LENGTH IS NULL, NUMERIC_PRECISION, CHARACTER_MAXIMUM_LENGTH) AS `length`, ' .
+                              'IF(CHARACTER_MAXIMUM_LENGTH IS NULL, NUMERIC_SCALE, 0) AS `decimal`, ' .
+                              'COLUMN_KEY = "PRI" AS `primary_key`, ' .
+                              'INSTR(EXTRA,"auto_increment") as `auto_increment`, ' .
+                              'COLUMN_KEY = "PRI" OR COLUMN_KEY = "UNI" as `unique`, ' .
+                              'NOT( COLUMN_KEY = "" OR COLUMN_KEY IS NULL) as `index` ' .
+                           'FROM information_schema.COLUMNS ' .
+                                 'WHERE TABLE_SCHEMA="' . $this->globals->db->name . '" ' .
+                                 'AND TABLE_NAME="' . $this->table . '" ORDER BY ORDINAL_POSITION';
+
+               
                $query = $this->query( $sql );
 
                $this->structure = array();
@@ -659,7 +665,7 @@
 
             if( is_null( $value ) ) return $value;
 
-            if( strpos( '[blog][mediumblob][bigblob][tinyblob][smallblob][text][mediumtext][bigtext][tinytext][smalltext]', $format->field_type ) ){
+            if( strpos( '[char][varchar][enum][blog][mediumblob][bigblob][tinyblob][smallblob][text][mediumtext][bigtext][tinytext][smalltext]', $format->field_type ) ){
                $value = $tools->antiInjection( $value, true, true );
             } else {
                $value = $tools->antiInjection( $value );
