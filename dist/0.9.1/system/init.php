@@ -1,4 +1,6 @@
 <?php
+//TODO - Só instanciar o Connection conectando se tiver recebido os dados
+//TODO - Verificar se conexão foi realizada com sucesso, se não, gerar uma exception
 //TODO - Remover a pasta JS do sistema, pensar em algo melhor pra fazer com aquilo
 
       @session_start();
