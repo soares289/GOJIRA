@@ -623,7 +623,7 @@
 
 				}elseif( is_numeric( $key ) ){
 
-               $where .= $primary[ 0 ] . '="' . $tools->antiInjection( $key ) . '"';
+               $where .= $primary[ 0 ] . '="' . $key . '"';
 
             } elseif( is_string( $key ) ){
 

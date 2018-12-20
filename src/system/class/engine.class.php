@@ -38,10 +38,10 @@
 
             //Renderiza o view
             if( file_exists( $globals->environment->viewPath . $file ) ){
-               echo $globals->smarty->fetch( $file );
+               return $globals->smarty->fetch( $file );
 
             } elseif( !is_object( $objData ) ){
-               echo $objData;
+               return $objData;
 
             }
 
@@ -61,7 +61,7 @@
                   case 0x1011:
                      if( method_exists( $error, 'error_404' ) ){
                         header("HTTP/1.0 404 Not Found");
-                        Engine::Render( 'Error', 'error_404', $param );
+                        echo Engine::Render( 'Error', 'error_404', $param );
                         exit;
                      } else {
                         throw( $e );
@@ -69,7 +69,7 @@
                      break;
                   case 0x1012:
                      if( method_exists( $error, 'error_403' ) ){
-                        Engine::Render( 'Error', 'error_403', $param );
+                        echo Engine::Render( 'Error', 'error_403', $param );
                         exit;
                      } else {
                         throw( $e );
@@ -78,7 +78,7 @@
                   case 0x1002:
                      if( method_exists( $error, 'error_500' ) ){
                         header('HTTP/1.1 500 Internal Server Error');
-                        Engine::Render( 'Error', 'error_500', $param );
+                        echo Engine::Render( 'Error', 'error_500', $param );
                         exit;
                      } else {
                         throw( $e );
@@ -86,7 +86,7 @@
                      break;
                   default:
                      if( method_exists( $error, 'error_unknow' ) ){
-                        Engine::Render( 'Error', 'error_unknow', $param );
+                        echo Engine::Render( 'Error', 'error_unknow', $param );
                         exit;
                      } else {
                         throw( $e );
@@ -107,9 +107,9 @@
                
                header('HTTP/1.1 500 Internal Server Error');
                if( method_exists( $error, 'error_500' ) ){
-                  Engine::Render( 'Error', 'error_500', $param );
+                  echo Engine::Render( 'Error', 'error_500', $param );
                } elseif( method_exists( $error, 'error_unknow' ) ){
-                  Engine::Render( 'Error', 'error_unknow', $param );
+                  echo Engine::Render( 'Error', 'error_unknow', $param );
                } else {
                   throw( $e );
                }
