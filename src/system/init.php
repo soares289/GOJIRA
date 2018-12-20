@@ -3,7 +3,7 @@
 
       @session_start();
 
-      define('GOJIRA_VERSION', '0.5.0');
+      define('GOJIRA_VERSION', '0.9.3');
 
       //Precisa saber a pasta do sistema que está sendo iniciado
       if( !isset( $absPath ) ) throw( new Exception('$absPath não localizado') );

@@ -1,11 +1,9 @@
 <?php
-//TODO - Só instanciar o Connection conectando se tiver recebido os dados
-//TODO - Verificar se conexão foi realizada com sucesso, se não, gerar uma exception
 //TODO - Remover a pasta JS do sistema, pensar em algo melhor pra fazer com aquilo
 
       @session_start();
 
-      define('GOJIRA_VERSION', '0.9.1');
+      define('GOJIRA_VERSION', '0.9.2');
 
       //Precisa saber a pasta do sistema que está sendo iniciado
       if( !isset( $absPath ) ) throw( new Exception('$absPath não localizado') );
@@ -40,7 +38,7 @@
       require_once( $systemPath . 'class/model.class.php' );
       require_once( $systemPath . 'class/collection.class.php' );
       require_once( $systemPath . 'class/engine.class.php' );
-      require_once( $systemPath . 'class/smarty/Smarty.class.php' );
+      require_once( $systemPath . 'class/smarty-3.1.33/libs/Smarty.class.php' );
 
 
 //Seta as globais
