@@ -55,7 +55,7 @@
 			function dateTosql( $date, $ltime = false ){
 				
 				if( empty( $date ) ){
-					return 'null';
+					return 'NULL';
 				}
 				
 				$ret  = substr($date,  6, 4) . substr($date, 3, 2) . substr($date, 0, 2);
@@ -74,9 +74,7 @@
          //Converte o formato da data para o mysql
 			function sqlTodate( $date, $ltime = false ){
 				
-				if( empty( $date ) ){
-					return '00/00/0000' . ($ltime ? ' 00:00' : '');
-				}
+				if( empty( $date ) ) return;
             
 				$ret  = substr($date,  6, 2) . '/' . substr($date, 4, 2)  . '/' . substr($date, 0, 4);
             
@@ -85,6 +83,50 @@
 				}
 	
 				return $ret;
-			}
+         }
+         
+
+
+         //Converte uma data (padrão yyyy-mm-dd ou dd-mm-yyyy para o formato usado nos inputs do html)
+         function dateToHtml( $date, $ltime = false ){
+         
+            $separator = '-';
+
+            if( empty( $date ) ) return '';
+            if( strpos( $date, '/') > 0 ) $separator = '/';
+
+            $split = explode( $separator, $date );
+
+            //Padrão internacional de data yyyy-mm-dd hh:ii:ss
+            if( strlen( $split[0] ) > 2 ){
+               $ret = substr($date, 0, 4) . '-' . substr($date, 5, 2) . '-' . substr($date, 8, 2);
+
+            //Padrão brasileiro dd-mm-yyyy hh:ii:ss
+            } else {
+               $ret = substr($date, 6, 4) . '-' . substr($date, 3, 2) . '-' . substr($date, 0, 2);
+
+            }
+
+            if( $ltime ){
+               $ret .=  'T' . substr( $date, 11, 5);
+            }
+
+            return $ret;
+
+         }
+
+         
+         //Converte uma data no formato dos inputs do html para o padrão brasileiro (dd-mm-yyyy hh:ii:ss, formato usado no saveRow do framework)
+         function htmlToDate( $date, $ltime = false ){
+         
+            if( empty( $date ) ) return 'NULL';
+            
+            $ret = substr($date, 8, 2) . '/' . substr($date, 5, 2) . '/' . substr($date, 0, 4);
+
+            if( $ltime ) $ret .=  ' ' . substr( $date, 11, 5) . ':00';
+
+            return $ret;
+
+         }
 		
 		}
