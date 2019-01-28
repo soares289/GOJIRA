@@ -54,7 +54,7 @@
 
                //Se não existir um model para o componente, instancia um model generico para facilitar acesso a base
                } else {
-                  $modelObj = new Model( $globals );
+                  $modelObj = new AppModel( $globals );
                }
 
                require_once( $controllerDir . $file );
