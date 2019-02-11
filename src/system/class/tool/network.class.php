@@ -75,8 +75,14 @@
 					$mail->Host       = $host;                               // sets GMAIL as the SMTP server
 					$mail->Port       = $port;                               // set the SMTP port for the GMAIL server
 					
-					//$mail->AddReplyTo($dest);
-					$mail->AddAddress($dest);
+               //$mail->AddReplyTo($dest);
+               if( is_array( $dest ) ){
+                  foreach( $dest as $a ){
+                     $mail->AddAddress( $a );
+                  }
+               } else {
+                  $mail->AddAddress($dest);
+               }
 					$mail->CharSet = 'UTF-8';
 					$mail->SetFrom($from, $name);
 
