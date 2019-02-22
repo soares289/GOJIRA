@@ -6,9 +6,6 @@
 	Carregada para dentro dessa classe automaticamente.
 */
 
-      //Classe de email PHPMailer usada pelo tools/network.class.php
-      require_once( dirname( __FILE__ ) . '/../vendor/phpmailer/PHPMailerAutoload.php' );
-		
 		class Tool{
 			
 			private $tools;

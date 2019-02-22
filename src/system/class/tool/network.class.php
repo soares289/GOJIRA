@@ -47,6 +47,11 @@
 			//Envia um email
 			function sendMail( $dest, $sub, $msg, $from, $host = 'localhost', $user = '', $pwd = '', $port = '587', $name = '', $secure = 'tls' ){
             
+            if( !class_exists('PHPMailer', false) ){
+               throw(new Exception('PHPMailer not found'));
+               exit;
+            }
+            
 				$mail = new PHPMailer(true); // the true param means it will throw exceptions on errors, which we need to catch
 
 				$mail->IsSMTP(); // telling the class to use SMTP

@@ -316,10 +316,10 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
             $sql = '';
 
-            if( !empty( $column  ) ) $sql .= $column . ( $compare == 'null' ? ' is null ' : '="' . $value . '" ');
-            if( !empty( $compare ) && $compare != 'null' ) $sql .= (empty( $sql ) ? '' : ' and ') . $compare;
-            if( !empty( $sql     ) ) $sql = 'select count( * ) as a from `' . $table . '` where ' . $sql;
-            
+            if( !empty( $column  ) ) $sql .= '`' . $column . '`' . ( strtolower($value) == 'null' || is_null($value) ? ' IS NULL ' : '="' . $value . '" ');
+            if( !empty( $compare ) ) $sql .= (empty( $sql ) ? '' : ' AND ') . $compare;
+            if( !empty( $sql     ) ) $sql = 'SELECT COUNT(*) AS a FROM `' . $table . '` WHERE ' . $sql;
+
             $query = $this->query( $sql );
             
             if( $this->count( $query ) > 0 ){
