@@ -532,7 +532,7 @@
 				//Monta a sentença de comparação no caso de ser um update e usa para identificar o mesmo
 				foreach( $pk as $i => $a ) $where .= (empty( $where ) ? '' : ' AND ') . '`' . $i . '`="' . $a . '"';
 
-				if( $this->exist( $table, "1", 1, $where ) ){
+				if( $this->exist( $table, '', '', $where ) ){
 
 					//É uma alteração
 					foreach( $structure as $col ){
