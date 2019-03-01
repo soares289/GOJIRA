@@ -631,7 +631,8 @@
 
 				} elseif( is_array( $key ) ){
 
-               $c = 0;
+               $c   = 0;
+               $tmp = '';
                foreach( $key as $i => $a ){
 
                   if( is_string( $i ) ){
