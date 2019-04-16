@@ -26,42 +26,6 @@
 			}
 			
 			
-			//executa request de alguma coisa
-			function request( $class, $proc, $param = array(), $lRet = false ){
-			
-            $globals = $GLOBALS['globals'];
-            $objData = Controller::Call( $class, $proc, $globals, $param );
-         
-            if( isset( $objData->view_file ) ){
-               $file = $objData->view_file . '.tpl';
-            } else {
-               $file = $class . '/' . $proc . '.tpl';
-            }
-
-            if( is_string( $objData ) ){
-               
-               if( $lRet ) return $objData;
-               echo $objData;
-
-            } else { //if( file_exists( $globals->environment->dir_view . $file ) ){
-
-               $smarty = new Smarty();
-               $smarty->setTemplateDir( $globals->environment->dir_view );
-               $smarty->assign( 'class'      , $class );
-               $smarty->assign( 'proc'       , $proc );
-               $smarty->assign( 'param'      , $param );
-               $smarty->assign( 'objData'    , $objData );
-               $smarty->assign( 'tools'      , $globals->tools );
-               $smarty->assign( 'environment', $globals->environment );
-
-               if( $lRet ) return $smarty->fetch( $file );
-               $smarty->display( $file );
-   
-            }
-
-            
-			}
-         
          			
          //Verifica se a aplicação está sendo acessada de um mobile
          function isMobile(){
