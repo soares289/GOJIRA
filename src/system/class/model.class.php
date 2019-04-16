@@ -435,7 +435,7 @@
 
 
 			//Busca a quantidade de resultados que tem na tabela, baseado nas chaves passadas
-			function countData( $key ){
+			function countData( $key = '' ){
 
 				$sql   = 'SELECT 1 FROM `' . $this->table . '`';
 				$where = $this->getWhere( $key );

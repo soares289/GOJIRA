@@ -1,8 +1,8 @@
 <?php
 
-define( 'LGN_LOGIN_INVALID', "Login inválido!");
-define( 'LGN_INATIVE'      , "Conta não ativada!");
-define( 'LGN_PASS_INVALID' , "Senha errada!");
+define( 'LGN_LOGIN_INVALID', "Usuário inválido");
+define( 'LGN_INATIVE'      , "Conta não ativada");
+define( 'LGN_PASS_INVALID' , "Senha inválida");
 
 define( 'LGN_DEFAULT_USER_TABLE' , 'user' );
 define( 'LGN_DEFAULT_TYPE_TABLE' , 'user_type' );
