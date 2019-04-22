@@ -106,7 +106,7 @@
             $ret     = false;
             $globals = $GLOBALS['globals'];
             $file    = strtolower($class) . '.php';
-				$class   = ucfirst( $class ) . '_Model';
+            $class   = ucwords(strtolower($class), "_0123456789") . '_Model';
 				$dir     = $globals->environment->modelPath;
             
             //Se localizar o arquivo no disco

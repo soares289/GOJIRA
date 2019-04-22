@@ -4,8 +4,16 @@
 		Extensão do tools com funções referentes a rede.
 		Requisições a servidores externos, envio de emails, etc.
 */
-		
-		
+      
+
+      //Classe de email PHPMailer usada pelo tools/network.class.php
+      require_once( __DIR__ . '/../../vendor/PHPMailer-6.0.7/src/PHPMailer.php' );
+      require_once( __DIR__ . '/../../vendor/PHPMailer-6.0.7/src/SMTP.php' );
+      require_once( __DIR__ . '/../../vendor/PHPMailer-6.0.7/src/Exception.php' );
+      use PHPMailer\PHPMailer\PHPMailer;
+      use PHPMailer\PHPMailer\SMTP;
+      use PHPMailer\PHPMailer\Exception;
+   
 		class Tool_Network{
 			
 			
@@ -45,53 +53,77 @@
 			
 			
 			//Envia um email
-			function sendMail( $dest, $sub, $msg, $from, $host = 'localhost', $user = '', $pwd = '', $port = '587', $name = '', $secure = 'tls' ){
+			function sendMail( $dest, $subject, $msg, $config ){
             
-            if( !class_exists('PHPMailer', false) ){
+            /*if( !class_exists('PHPMailer', false) ){
                throw(new Exception('PHPMailer not found'));
                exit;
+            }*/
+
+            if( !isset( $config['from']) ){
+               throw(new Exception('From is required in config array'));
+               exit;
             }
-            
+
+            if( !isset( $config['host'] ) )   $config['host'] = 'localhost';
+            if( !isset( $config['port'] ) )   $config['port'] = '587';
+            if( !isset( $config['secure'] ) ) $config['secure'] = 'tls';
+            if( !isset( $config['name'] ) )   $config['name'] = substr( $from, 0, strpos($from, '@'));
+
 				$mail = new PHPMailer(true); // the true param means it will throw exceptions on errors, which we need to catch
 
 				$mail->IsSMTP(); // telling the class to use SMTP
+
+            $name = $config['name'];
             
-            if( empty( $name ) ){
-               $name = explode( '@', $from);
-               $name = $name[0];
-            }
-            
-            if( empty( $user ) ){
+            if( !isset( $config['user'] ) ){
                $mail->SMTPAuth   = false;                               // disable SMTP authentication
                
             } else {
                $mail->SMTPAuth   = true;                                // enable SMTP authentication
-               $mail->Username   = $user;                               // GMAIL username
-					$mail->Password   = $pwd;                                // GMAIL password
+               $mail->Username   = $config['user'];                     // GMAIL username
+					$mail->Password   = $config['password'];                 // GMAIL password
                
             }
             
-            
-            
+            //Adiciona os destinatarios
+            if( is_array( $dest ) ){
+               foreach( $dest as $a ) $mail->addAddress( $a );
+            } else {
+               $mail->addAddress($dest);
+            }
+
+
+            //Adiciona Copia
+            if( isset( $config['cc'] ) ){
+               if( is_array( $config['cc'] ) ){
+                  foreach( $config['cc'] as $a ) $mail->addCC( $a );
+               } else {
+                  $mail->addCC( $config['cc'] );
+               }
+            }
+
+            //Adiciona Copia oculta
+            if( isset( $config['bcc'] ) ){
+               if( is_array( $config['bcc'] ) ){
+                  foreach( $config['bcc'] as $a ) $mail->addBCC( $a );
+               } else {
+                  $mail->addBCC( $config['bcc'] );
+               }
+            }
+
 				try {
 
+               //Configura o smtp
 					$mail->SMTPDebug  = 0;                                   // enables SMTP debug information (for testing)
-               $mail->SMTPSecure = $secure;  //"ssl";//"tls";             // sets the prefix to the servier
-					$mail->Host       = $host;                               // sets GMAIL as the SMTP server
-					$mail->Port       = $port;                               // set the SMTP port for the GMAIL server
-					
-               //$mail->AddReplyTo($dest);
-               if( is_array( $dest ) ){
-                  foreach( $dest as $a ){
-                     $mail->AddAddress( $a );
-                  }
-               } else {
-                  $mail->AddAddress($dest);
-               }
-					$mail->CharSet = 'UTF-8';
-					$mail->SetFrom($from, $name);
+               $mail->SMTPSecure = $config['secure'];  //"ssl";//"tls";             // sets the prefix to the servier
+					$mail->Host       = $config['host'];                               // sets GMAIL as the SMTP server
+					$mail->Port       = $config['port'];                               // set the SMTP port for the GMAIL server
+					$mail->CharSet    = 'UTF-8';
+               $mail->setFrom($config['from'], $config['name']);
+               $mail->addReplyTo($config['from'], $config['name']);
 
-					$mail->Subject = $sub;
+					$mail->Subject = $subject;
 					$mail->MsgHTML($msg);
 					$mail->Send();
 
@@ -100,6 +132,8 @@
 				}
             
          }
+
+
          
          
          //Usa o php para enviar um email

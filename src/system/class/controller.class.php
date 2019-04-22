@@ -37,9 +37,9 @@
                $globals = $GLOBALS['globals'];
             }
 
-            $file    = strtolower($class) . '.php';
-				$class   = ucfirst( $class ) . '_Controller';
-				$dir     = $globals->environment->controllerPath;
+            $file  = strtolower($class) . '.php';
+            $class = ucwords(strtolower($class), "_0123456789") . '_Controller';
+				$dir   = $globals->environment->controllerPath;
 
 				//Se localizar o arquivo no disco
 				if( file_exists(  $dir . $file ) ){
@@ -112,7 +112,7 @@
             $ret     = false;
             $globals = $GLOBALS['globals'];
             $file    = strtolower($class) . '.php';
-				$class   = ucfirst( $class ) . '_Controller';
+            $class   = ucwords(strtolower($class), "_0123456789") . '_Controller';
 				$dir     = $globals->environment->controllerPath;
             
             //Se localizar o arquivo no disco

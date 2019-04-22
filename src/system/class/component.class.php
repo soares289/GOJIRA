@@ -32,11 +32,12 @@
             }
 
             $file  = strtolower($class) . '.php';
+            $class = ucwords(strtolower($class), "_0123456789");
 
-            $controllerClass = ucfirst( $class ) . '_ComponentController';
+            $controllerClass = $class . '_ComponentController';
 				$controllerDir   = $globals->environment->componentControllerPath;
 
-            $modelClass = ucfirst( $class ) . '_ComponentModel';
+            $modelClass = $class . '_ComponentModel';
             $modelDir   = $globals->environment->componentModelPath;
 
             //Verifica se o controller (parte base e principal) existe
@@ -89,7 +90,7 @@
                $this->globals->smarty->assign( 'component', $this->componentName );
                $this->globals->smarty->assign( 'environment', $this->env );
                $this->globals->smarty->assign( 'env', $this->env );
-               $this->globals->smarty->assign(   'objData', $data );
+               $this->globals->smarty->assign( 'objData', $data );
 
                if( is_array( $data ) || is_object( $data ) ){
                   foreach( $data as $i => $a ){
@@ -99,7 +100,7 @@
                   }
 
                }
-
+               
                $ret = $this->globals->smarty->fetch( $file );
             }
             return $ret;
