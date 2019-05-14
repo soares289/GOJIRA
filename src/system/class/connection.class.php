@@ -261,7 +261,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
             $this->checkConnection();
 
-            $query = $this->query( 'select max(' . $field . ') as a from ' . $table );
+            $query = $this->query( 'select max(`' . $field . '`) as a from `' . $table . '`' );
             $row = $this->fetch($query);
             return $row['a'];
 
@@ -277,7 +277,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
             $this->checkConnection();
 
-            $query = $this->query( 'select min(' . $field . ') as a from ' . $table );
+            $query = $this->query( 'select min(`' . $field . '`) as a from `' . $table . '`' );
             $row = $this->fetch($query);
             return $row['a'];
 
