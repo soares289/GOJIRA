@@ -504,7 +504,11 @@
 				//Verifica se os dados estão ok
 				foreach( $structure as $col ){
 
-               $col_value = $row[ $col->name ];
+               if( isset( $row[ $col->name ] ) ){
+                  $col_value = $row[ $col->name ];
+               } else {
+                  $col_value = null;
+               }
 
 					//Campos auto_increment ou timestamp são ignorados na hora de salvar, por isso, não precisa de verificação
 					if( !(($col->is_auto_increment && empty($col_value)) || $col->field_type == 'timestamp') ){
