@@ -1,7 +1,8 @@
 <?php
 
 define( 'LGN_LOGIN_INVALID', "Usuário inválido");
-define( 'LGN_INATIVE'      , "Conta não ativada");
+define( 'LGN_PENDING'      , "Conta com ativação pendente");
+define( 'LGN_INATIVE'      , "Conta desativada");
 define( 'LGN_PASS_INVALID' , "Senha inválida");
 
 define( 'LGN_DEFAULT_USER_TABLE' , 'user' );
@@ -20,11 +21,12 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 			private $tools;
 			private $id;
 			
-         private $userTable = LGN_DEFAULT_USER_TABLE;
-         private $typeTable = LGN_DEFAULT_TYPE_TABLE;
-			private $useEmail  = LGN_USE_EMAIL;
-			
-         private $useCookie = false;
+         private $userTable   = LGN_DEFAULT_USER_TABLE;
+         private $typeTable   = LGN_DEFAULT_TYPE_TABLE;
+			private $useEmail    = LGN_USE_EMAIL;
+         private $statusList  = ['PENDING' => 0, 'INACTIVE' => 1, 'ACTIVE' => 2];
+         private $statusField = 'status';
+         private $useCookie   = false;
          
 			/***   Construtores ***/
 			function __construct(){
@@ -44,7 +46,8 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 			//Constructor com 2 parametros	 
 			function __construct2( $conn, $tools ){
 				$this->conn = $conn;
-				$this->tools = $tools;
+            $this->tools = $tools;
+            $this->configure( $this->userTable, $this->typeTable);
 			}
 			
 			//Constructor com 4 parametros
@@ -52,10 +55,8 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 				
 				$this->conn   = $conn;
 				$this->tools  = $tools;
-				
-				$this->userTable = $userTable;
-				$this->typeTable = $typeTable;
-				
+            
+            $this->configure( $userTable, $typeTable);
 			}
 
 			
@@ -68,6 +69,12 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 
 				$this->userTable = $userTable;
 				$this->typeTable = $typeTable;
+
+            //Se existe a coluna status
+            if( !$this->conn->fieldExist( $userTable, $this->statusField ) ){
+               $this->statusField = 'active';
+               $this->statusList  = ['PENDING' => -1, 'INACTIVE' => 0, 'ACTIVE' => 1];
+            }
 
 			}
 			
@@ -94,7 +101,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 				   				 'a.password AS pwd, ' .
 									 'a.login AS login, ' .
 									 'a.email AS email, ' .
-									 'a.active AS active, ' .
+									 'a.' . $this->statusField . ' AS status, ' .
 							($this->conn->fieldExist( $this->userTable, 'name' ) ? 
 									 'a.name AS name ' : '"" AS name ') .
                      ' FROM ' . $this->userTable . ' AS a ' . 
@@ -109,7 +116,12 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 				if( strlen( $pwd ) != 128 ) $pwd = $this->toPassword( $pwd );
 
 				//Verifica se o usuário está ativo
-				if( ! $row[ 'active' ] ){
+				if( $row[ 'status' ] == $this->statusList['PENDING'] ){
+					throw( new Exception( LGN_PENDING, 0x9004 ) );
+				}
+
+				//Verifica se o usuário está ativo
+				if( $row[ 'status' ] == $this->statusList['INACTIVE'] ){
 					throw( new Exception( LGN_INATIVE, 0x9002 ) );
 				}
 				
@@ -162,7 +174,6 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
                   if( $this->useCookie ){
                      
                      foreach( $fields as $fld ){
-                        echo strtolower($a . $fld);
                         setcookie(strtolower($a . $fld), 0, 2);
                         unset( $_COOKIE[ strtolower($a . $fld)] );
                      }
@@ -293,7 +304,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
                            
                         $typeCod = $this->getType( $a );
 
-                        if( $this->conn->exist( $this->userTable, 'id', $_COOKIE[ $a . 'Cod'], "type IN " . $typeCod . ' AND active' ) ){
+                        if( $this->conn->exist( $this->userTable, 'id', $_COOKIE[ $a . 'Cod'], "type IN " . $typeCod . ' AND ' . $this->statusField . '=' . $this->statusList['ACTIVE'] ) ){
                            $n++;
                         }
                      }
@@ -311,8 +322,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
                         !empty( $_SESSION[ $a . 'Email'] ) ){
                            
                         $typeCod = $this->getType( $a );
-
-                        if( $this->conn->exist( $this->userTable, 'id', $_SESSION[ $a . 'Cod'], "type IN " . $typeCod . ' AND active' ) ){
+                        if( $this->conn->exist( $this->userTable, 'id', $_SESSION[ $a . 'Cod'], "type IN " . $typeCod . ' AND ' . $this->statusField . '=' . $this->statusList['ACTIVE'] ) ){
                            $n++;
                         }
                      }
