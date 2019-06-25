@@ -562,33 +562,41 @@
 					$sql     = 'INSERT INTO `' . $table . '`(' . $header . ') VALUES(' . $sql . ')';
 				}
             
-				//Executa o comando na base de dados
-				if( $this->execute( $sql ) ){
 
-   				$sql = $where = '';
+            //Não executa o insert, retorna o sql
+            if( $retCommand ){
+               return $sql;
+               
+            } else {
 
-					foreach( $pk as $i => $a ){
-
-						if( $structure[ $i ]->is_auto_increment && (empty( $a ) || strtolower($a) == 'null') ){
-							$a = $this->lastId;
-						}
-
-						$where .= (empty( $sql ) ? '' : ' AND ') . '`' . $i . '`="' . $a . '"';
-						$sql   .= (empty( $sql ) ? '' : ', ') . '`' . $i . '`';
-
-					}
-
-					$sql = 'SELECT ' . $sql . ' FROM `' . $table . '` WHERE ' . $where;
-
-               $query = $this->query( $sql, true );
-					$row   = $this->fetch( $query );
-
-				} else {
-
-					//Se der erro na hora de salvar, joga um erro para o nivel de cima
-					throw( new ModelException( "Error while saving - " . $sql, 0x2015 ) );
-
-				}
+               //Executa o comando na base de dados
+               if( $this->execute( $sql ) ){
+                  
+                  $sql = $where = '';
+                  
+                  foreach( $pk as $i => $a ){
+                     
+                     if( $structure[ $i ]->is_auto_increment && (empty( $a ) || strtolower($a) == 'null') ){
+                        $a = $this->lastId;
+                     }
+                     
+                     $where .= (empty( $sql ) ? '' : ' AND ') . '`' . $i . '`="' . $a . '"';
+                     $sql   .= (empty( $sql ) ? '' : ', ') . '`' . $i . '`';
+                     
+                  }
+                  
+                  $sql = 'SELECT ' . $sql . ' FROM `' . $table . '` WHERE ' . $where;
+                  
+                  $query = $this->query( $sql, true );
+                  $row   = $this->fetch( $query );
+                  
+               } else {
+                  
+                  //Se der erro na hora de salvar, joga um erro para o nivel de cima
+                  throw( new ModelException( "Error while saving - " . $sql, 0x2015 ) );
+                  
+               }
+            }
 
 				return $row;
 
