@@ -705,31 +705,40 @@
 
 				$ret = '';
 
-            if( is_string($value) && trim($value) == '' ){
-               $ret = '"' . $value . '"';
+            if( strtolower( $value ) == 'null' || is_null( $value ) ){
+               $ret = 'NULL';
 
-            } else {
+            } elseif( preg_match( $this->mysqlFuncRegex, $value ) ){
+               $ret = $value;
 
-               if( strtolower( $value ) == 'null' || is_null( $value ) ){
+            } elseif( strpos( '[timestamp][time][datetime][date][year]', $format->field_type ) !== false ){
+               if( empty( $value ) && $format->accept_null ){
                   $ret = 'NULL';
+               } else {
+                  $ret = '"' .  $value . '"';
+               }
 
-               } elseif( preg_match( $this->mysqlFuncRegex, $value ) ){
+            } elseif( strpos( '[integer][int][bigint][mediumint][smallint][tinyint][decimal][double][float][real][unsigned]', $format->field_type ) !== false ){
+               if( $value === '' ){
+                  $ret = ($format->accept_null ? 'NULL' : 0);
+               } else {
                   $ret = $value;
+               }
 
-               } elseif( strpos( '[timestamp][datetime][date][integer][decimal][double][float][int][smallint][bigint][tinyint][unsigned]', $format->field_type ) !== false ){
-                  $ret = $value;
-
-               } elseif( $format->field_type == 'enum' ){
-                  if( is_int($value) && $value > 0 ){
+            } elseif( $format->field_type == 'enum' ){
+               if( is_int($value) ){
+                  if( $value > 0 ){
                      $ret = $value;
                   } else {
-                     $ret = '"' . $value . '"';
+                     $ret = ($format->accept_null ? 'NULL' : 0);
                   }
-
                } else {
-                  $ret = '"' . addslashes(stripslashes($value)) . '"';
+                  $ret = '"' . $value . '"';
                }
-				}
+
+            } else {
+               $ret = '"' . addslashes(stripslashes($value)) . '"';
+            }
 
 				return $ret;
 
