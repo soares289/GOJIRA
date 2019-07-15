@@ -27,6 +27,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
          private $statusList  = ['PENDING' => 0, 'INACTIVE' => 1, 'ACTIVE' => 2];
          private $statusField = 'status';
          private $useCookie   = false;
+         private $cookieTime  = 1800;
          
 			/***   Construtores ***/
 			function __construct(){
@@ -65,7 +66,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
          function get_typeTable(){ return $this->typeTable; }
 			function get_useEmail(){ return $this->useEmail; }
 
-			function configure($userTable, $typeTable){
+			function configure($userTable, $typeTable, $cookieTime = ''){
 
 				$this->userTable = $userTable;
 				$this->typeTable = $typeTable;
@@ -75,6 +76,8 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
                $this->statusField = 'active';
                $this->statusList  = ['PENDING' => -1, 'INACTIVE' => 0, 'ACTIVE' => 1];
             }
+
+            $this->cookieTime = (is_numeric( $cookieTime ) ? $cookieTime : LGN_COOKIE_EXPIRE_TIME);
 
 			}
 			
@@ -133,13 +136,13 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 				
 				//Salva a sessão
             if( $this->useCookie ){
-               setcookie( strtolower($row['type']) . "Logged" , true, time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "Cod"    , $row['code'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "Login"  , $row['login'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "Email"  , $row['email'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "Name"   , $row['name'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "Type"   , $row['type'], time() + LGN_COOKIE_EXPIRE_TIME);
-               setcookie( strtolower($row['type']) . "TypeCod", $row['type_cod'], time() + LGN_COOKIE_EXPIRE_TIME);
+               setcookie( strtolower($row['type']) . "Logged" , true, time() + $this->cookieTime, '/');
+               setcookie( strtolower($row['type']) . "Cod"    , $row['code'], time() + $this->cookieTime, '/');
+               setcookie( strtolower($row['type']) . "Login"  , $row['login'], time() + $this->cookieTime, '/');
+               setcookie( strtolower($row['type']) . "Email"  , $row['email'], time() + $this->cookieTime, '/');
+               setcookie( strtolower($row['type']) . "Name"   , $row['name'], time() + $this->cookieTime, '/');
+               setcookie( strtolower($row['type']) . "Type"   , $row['type'], time() + $this->cookieTime, '/');
+               setcookie( strtolower($row['type']) . "TypeCod", $row['type_cod'], time() + $this->cookieTime, '/');
                
             } else {
                $_SESSION[ $row['type'] . "Logged"]  = true;
@@ -493,9 +496,11 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
          
 			
          //Seta a propriedade useCookie
-         function setCookie( $val ){
+         function setCookie( $val, $cookieTime = ''){
             //Forçar valor lógico
-            $this->useCookie = ($val == true ? true : false);
+            $this->useCookie  = ($val == true ? true : false);
+
+            if( is_numeric( $time ) )  $this->cookieTime = $cookieTime;
          }
 		
 		}
