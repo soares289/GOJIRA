@@ -20,14 +20,15 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 			private $connection;
 			private $tools;
 			private $id;
-			
+         
+         private $configured  = false;
          private $userTable   = LGN_DEFAULT_USER_TABLE;
          private $typeTable   = LGN_DEFAULT_TYPE_TABLE;
 			private $useEmail    = LGN_USE_EMAIL;
          private $statusList  = ['PENDING' => 0, 'INACTIVE' => 1, 'ACTIVE' => 2];
          private $statusField = 'status';
          private $useCookie   = false;
-         private $cookieTime  = 1800;
+         private $cookieTime  = LGN_COOKIE_EXPIRE_TIME;
          
 			/***   Construtores ***/
 			function __construct(){
@@ -48,7 +49,6 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 			function __construct2( $connection, $tools ){
 				$this->connection = $connection;
             $this->tools      = $tools;
-            $this->configure( $this->userTable, $this->typeTable);
 			}
 			
 			//Constructor com 4 parametros
@@ -77,14 +77,18 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
                $this->statusList  = ['PENDING' => -1, 'INACTIVE' => 0, 'ACTIVE' => 1];
             }
 
-            $this->cookieTime = (is_numeric( $cookieTime ) ? $cookieTime : LGN_COOKIE_EXPIRE_TIME);
+            $this->cookieTime = (is_numeric( $cookieTime ) ? $cookieTime : $this->cookieTime);
+
+            $this->configured = true;
 
 			}
 			
 			
 			//Executa o login
 			function login( $login, $pwd, $type ){
-				
+            
+            if( !$this->configured ) $this->configure( $this->userTable, $this->typeTable);
+
 				$login = $this->tools->antiInjection( $login );
 				$pwd   = $this->tools->antiInjection( $pwd );
 				$type  = $this->tools->antiInjection( $type );
@@ -214,7 +218,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 			//Busca qual o tipo de usuário logado.
 			//Retorno pode ser 1 = SHORTCODE, 2 - ID, 3 - NAME
 			function loggedType( $type, $return = 1 ){
-				
+            
 				//Converte o tipo para o formato certo ou busca ele da db caso não seja informado
 				if( empty( $types ) ){
 					
@@ -286,7 +290,9 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
          
 			//Verifica se o usuario está logado
 		   function isLogged( $type ){
-				
+            
+            if( !$this->configured ) $this->configure( $this->userTable, $this->typeTable);
+            
 				$type = $this->getType( $type, true );
 				$type = explode( ',', strtoupper( $type ) );
 				$n    = 0;

@@ -9,7 +9,7 @@
 
 			private   $table;				//Tabela base do modelo
 			private   $structure;		//Estrutura da tabela
-			private   $sql = array();  //SQL que deve ser usado na proxima busca
+			private   $sql = [];       //SQL que deve ser usado na proxima busca
 
          private $mysqlFuncRegex = '';
          private $mysqlLiteralRegex = '/\b(NULL|CURRENT_TIMESTAMP)\b/ui';      //Palavras reservadas ou nomes de váriaveis que não devem ser escapados
@@ -28,19 +28,12 @@
             $class         = get_class( $this );
 
 				$this->globals    = $globals;
-            $this->connection = $this->globals->connection->connection;
-            $this->database   = $this->globals->connection->database;
-            $this->host       = $this->globals->connection->host;
             
             //Limpa o nome da classe para tentar buscar o nome da tabela
             $table       = explode('_', $class);
             $this->table = strtolower( substr( $class, 0, strlen( $class) - strlen(end($table)) -1 ) );
 
-            
-            if( !in_array( $class, $reserved ) ){
-               $this->updateTableInfo();
-               $this->resetCommand();
-            }
+            $this->resetCommand();
 
             $this->mysqlFuncRegex = '/(' . implode('|',$this->mysqlFunctions) . ')\(.*\)/ui';
 
@@ -52,17 +45,8 @@
 			//propriedades do objeto
 			//$table
 			function set_table( $val ){
-
-            if( $this->connected ){
-               if( $this->tableExist( $val ) ){
-                  $this->table = $val;
-                  $this->updateTableInfo();
-               } else {
-                  throw( new ModelException( "Invalid table: <strong>\"" . $val . "\"</strong>", 0x2003 ) );
-               }
-            } else {
-               $this->table = $val;
-            }
+            $this->table      = $val;
+            $this->structure = null;
 			}
 			function get_table(){ return $this->table; }
 
@@ -331,43 +315,47 @@
 			//Atualiza as informações da tabela
 			function updateTableInfo(){
 
-            if( $this->isConnected() ){
-               $sql  =  'SELECT COLUMN_NAME AS `name`, ' .
-                              'COLUMN_DEFAULT as `default`, ' .
-                              'COLUMN_DEFAULT IS NULL as `default_is_null`, ' .
-                              'IS_NULLABLE = "YES" AS `null`, ' .
-                              'DATA_TYPE AS `type`, ' .
-                              'IF(CHARACTER_MAXIMUM_LENGTH IS NULL, NUMERIC_PRECISION, CHARACTER_MAXIMUM_LENGTH) AS `length`, ' .
-                              'IF(CHARACTER_MAXIMUM_LENGTH IS NULL, NUMERIC_SCALE, 0) AS `decimal`, ' .
-                              'COLUMN_KEY = "PRI" AS `primary_key`, ' .
-                              'INSTR(EXTRA,"auto_increment") as `auto_increment`, ' .
-                              'COLUMN_KEY = "PRI" OR COLUMN_KEY = "UNI" as `unique`, ' .
-                              'NOT( COLUMN_KEY = "" OR COLUMN_KEY IS NULL) as `index` ' .
-                           'FROM information_schema.COLUMNS ' .
-                                 'WHERE TABLE_SCHEMA="' . $this->globals->database->name . '" ' .
-                                 'AND TABLE_NAME="' . $this->table . '" ORDER BY ORDINAL_POSITION';
+            if( is_array( $this->structure ) ) return;
 
-               
-               $query = $this->query( $sql );
+            if( ! $this->tableExist( $this->table ) ){
+               throw( new ModelException( "Invalid table: <strong>\"" . $this->table . "\"</strong>", 0x2003 ) );
+            }
+            
+            $sql  =  'SELECT COLUMN_NAME AS `name`, ' .
+                           'COLUMN_DEFAULT as `default`, ' .
+                           'COLUMN_DEFAULT IS NULL as `default_is_null`, ' .
+                           'IS_NULLABLE = "YES" AS `null`, ' .
+                           'DATA_TYPE AS `type`, ' .
+                           'IF(CHARACTER_MAXIMUM_LENGTH IS NULL, NUMERIC_PRECISION, CHARACTER_MAXIMUM_LENGTH) AS `length`, ' .
+                           'IF(CHARACTER_MAXIMUM_LENGTH IS NULL, NUMERIC_SCALE, 0) AS `decimal`, ' .
+                           'COLUMN_KEY = "PRI" AS `primary_key`, ' .
+                           'INSTR(EXTRA,"auto_increment") as `auto_increment`, ' .
+                           'COLUMN_KEY = "PRI" OR COLUMN_KEY = "UNI" as `unique`, ' .
+                           'NOT( COLUMN_KEY = "" OR COLUMN_KEY IS NULL) as `index` ' .
+                        'FROM information_schema.COLUMNS ' .
+                              'WHERE TABLE_SCHEMA="' . $this->globals->database->name . '" ' .
+                              'AND TABLE_NAME="' . $this->table . '" ORDER BY ORDINAL_POSITION';
 
-               $this->structure = array();
-               while( $row = $this->fetch( $query ) ){
+            
+            $query = $this->query( $sql );
 
-                  $obj = new StdClass();
-                  $obj->name              = $row['name'];
-                  $obj->default_value     = $row['default'];
-                  $obj->default_is_null   = $row['default_is_null'];
-                  $obj->accept_null       = $row['null'];
-                  $obj->field_type        = $row['type'];
-                  $obj->length            = $row['length'];
-                  $obj->decimal           = $row['decimal'];
-                  $obj->is_primary_key    = $row['primary_key'];
-                  $obj->is_auto_increment = $row['auto_increment'];
-                  $obj->is_unique         = $row['unique'];
-                  $obj->is_index          = $row['index'];
+            $this->structure = [];
+            while( $row = $this->fetch( $query ) ){
 
-                  $this->structure[ $row['name'] ] = $obj;
-               }
+               $obj = new StdClass();
+               $obj->name              = $row['name'];
+               $obj->default_value     = $row['default'];
+               $obj->default_is_null   = $row['default_is_null'];
+               $obj->accept_null       = $row['null'];
+               $obj->field_type        = $row['type'];
+               $obj->length            = $row['length'];
+               $obj->decimal           = $row['decimal'];
+               $obj->is_primary_key    = $row['primary_key'];
+               $obj->is_auto_increment = $row['auto_increment'];
+               $obj->is_unique         = $row['unique'];
+               $obj->is_index          = $row['index'];
+
+               $this->structure[ $row['name'] ] = $obj;
             }
 			}
 
@@ -438,6 +426,8 @@
 			//Busca a quantidade de resultados que tem na tabela, baseado nas chaves passadas
 			function countData( $key = '' ){
 
+            $this->updateTableInfo();
+
 				$sql   = 'SELECT 1 FROM `' . $this->table . '`';
 				$where = $this->getWhere( $key );
 
@@ -450,6 +440,8 @@
 
 			//Retorna um objeto row com os valores padroes dos campos
 			function getEmptyRow( $lArray = false ){
+
+            $this->updateTableInfo();
 
             if( $lArray ){
                $row = [];
@@ -474,6 +466,8 @@
 			//Deleta um registro ou uma serie de registros
 			function delete( $key ){
 
+            $this->updateTableInfo();
+
 				$sql = 'DELETE FROM `' . $this->table . '` WHERE ' . $this->getWhere( $key );
 
 				if( ! $this->execute( $sql ) ){
@@ -487,6 +481,8 @@
 
 			//Salva uma linha na base de dados
 			function saveRow( $row, $retCommand = false ){
+
+            $this->updateTableInfo();
 
 				$table     = $this->table;
 				$sql       = '';
@@ -607,6 +603,8 @@
 
 			//Busca um array com as chaves primarias da estrutura
 			function getPrimary( $structure = ''){
+            
+            $this->updateTableInfo();
 
 				$primary = [];
             if( empty( $structure ) ) $structure = $this->structure;
@@ -623,6 +621,8 @@
 
 			//Retorna a parte de um where padrao, usado internamente
 			function getWhere( $key, $structure = '' ){
+
+            $this->updateTableInfo();
 
             if( empty( $structure ) ) $structure = $this->structure;
 

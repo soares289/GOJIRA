@@ -22,13 +22,13 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
 
       class Connection extends GojiraCore{
     
-         protected $connection;    //Objeto de conexão
-         protected $lastCommand;   //Ultimo comando executado
+         protected static $connection;    //Objeto de conexão
+         protected static $lastCommand;   //Ultimo comando executado
          
-         protected $database;		//Base de dados em que está conectado
-         protected $host;			//Host atual conectado
-			private $user;				//Usuário que foi usado para conectar
-			private $password;		//Senha para a base de dados
+         protected static $database;		//Base de dados em que está conectado
+         protected static $dbHost;			   //Host atual conectado
+			protected static $dbUser;			   //Usuário que foi usado para conectar
+			protected static $dbPassword;		//Senha para a base de dados
          
 
          //As propriedades estão ai para manter compatibilidade com sistemas antigos
@@ -57,22 +57,22 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
         
         
          /***   Metodos de SET e GET de valores ***/
-         function get_connection()  { return $this->connection; }
+         function get_connection()  { return self::$connection; }
          function get_connected()   { return $this->isConnected(); }
-         function get_lastCommand() { return $this->lastCommand; }
+         function get_lastCommand() { return self::$lastCommand; }
          function get_lastId()      { return mysqli_insert_id( $this->connection ); }
-			function get_database()    { return $this->database; }
-         function get_host()        { return $this->host; }
+			function get_database()    { return self::$database; }
+         function get_host()        { return self::$dbHost; }
         
         
         
          /***   Metodos do Objeto ***/
          function configure($dbHost, $dbUser, $dbPass, $dbName = ''){
 
-            $this->host     = $dbHost;
-            $this->user     = $dbUser;
-            $this->password = $dbPass;
-            $this->database = $dbName;
+            self::$dbHost     = $dbHost;
+            self::$dbUser     = $dbUser;
+            self::$dbPassword = $dbPass;
+            self::$database   = $dbName;
 
          }
         
@@ -81,12 +81,12 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
          function connect(){
 
             //Quando não existe o host, identifica como uma sessão sem conexão com o banco
-            if( empty( $this->host ) ){
+            if( empty( self::$dbHost ) ){
                throw(new Exception( DB_CONNECTION_NO_HOST ) );
                exit();
             }
             
-            $connection = new mysqli($this->host, $this->user, $this->password, $this->database );
+            $connection = new mysqli(self::$dbHost, self::$dbUser, self::$dbPassword, self::$database );
             
             //Verifica se conectou corretamente
             if(mysqli_connect_errno()){
@@ -94,7 +94,7 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
                exit();
             }
             
-            $this->connection = $connection;
+            self::$connection = $connection;
             
             $this->execute("SET NAMES 'utf8'");
             $this->execute('SET character_set_connection=utf8');
@@ -108,11 +108,11 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
          //Seleciona a base de dados ativa da coexão
          function selectDatabase( $dbName ){
 				
-            $this->database = $dbName;
+            self::$database = $dbName;
             $ret            = false;
 
             if( $this->connected ){
-               $ret = $this->connection->select_db( $this->database );
+               $ret = self::$connection->select_db( self::$database );
             } 
 
             return $ret;
@@ -126,7 +126,7 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
             $ret = false;
 
             if( $this->connected ){
-               $ret = @$this->connection->close();
+               $ret = @self::$connection->close();
             }
 
             return $ret;
@@ -146,10 +146,10 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
 			function isConnected(){
 				
 				//Se não for objeto é por que não está conectado
-				if( ! is_object( $this->connection ) ) return false;
+				if( ! is_object( self::$connection ) ) return false;
 				
 				//Se for objeto, verifica se a conexão está ativa
-				return $this->connection->ping();
+				return self::$connection->ping();
 				
 			}
 
@@ -170,9 +170,9 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
             
             $this->checkConnection();
 
-            $this->lastCommand = $sql;
+            self::$lastCommand = $sql;
             
-            $query = $this->connection->query( $sql );
+            $query = self::$connection->query( $sql );
             
             if( !is_object($query) && $query === false ){
                throw( new Exception(DB_CONNECTION_INVALID_SQL) );
@@ -189,10 +189,10 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
 				
             $ret = false;
 				
-            $this->lastCommand = $sql;
+            self::$lastCommand = $sql;
                         
 				//Executa o comando
-            if( $stmt = $this->connection->prepare( $sql ) ){
+            if( $stmt = self::$connection->prepare( $sql ) ){
                return $stmt->execute();
             }
             
@@ -207,19 +207,19 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
             
             if( ! is_array( $sql ) ) $sql = array( $sql );
             
-            $this->connection->autocommit( false );
-            $this->connection->begin_transaction( MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT );
+            self::$connection->autocommit( false );
+            self::$connection->begin_transaction( MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT );
                
             foreach( $sql as $a ){
                if( ! $this->execute( $a ) ){
-                  $this->connection->rollback(); 
-                  $this->connection->autocommit( true );
+                  self::$connection->rollback(); 
+                  self::$connection->autocommit( true );
                   return false;
                }
             }
             
-            $this->connection->commit();
-            $this->connection->autocommit( true );
+            self::$connection->commit();
+            self::$connection->autocommit( true );
             
             return true;
          }
