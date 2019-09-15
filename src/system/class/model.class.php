@@ -27,10 +27,10 @@
             $reserved      = ['Model','AppModel','ComponentModel'];
             $class         = get_class( $this );
 
-				$this->globals = $globals;
-            $this->conn    = $this->globals->conn->conn;
-            $this->db      = $this->globals->conn->db;
-            $this->host    = $this->globals->conn->host;
+				$this->globals    = $globals;
+            $this->connection = $this->globals->connection->connection;
+            $this->database   = $this->globals->connection->database;
+            $this->host       = $this->globals->connection->host;
             
             //Limpa o nome da classe para tentar buscar o nome da tabela
             $table       = explode('_', $class);
@@ -344,7 +344,7 @@
                               'COLUMN_KEY = "PRI" OR COLUMN_KEY = "UNI" as `unique`, ' .
                               'NOT( COLUMN_KEY = "" OR COLUMN_KEY IS NULL) as `index` ' .
                            'FROM information_schema.COLUMNS ' .
-                                 'WHERE TABLE_SCHEMA="' . $this->globals->db->name . '" ' .
+                                 'WHERE TABLE_SCHEMA="' . $this->globals->database->name . '" ' .
                                  'AND TABLE_NAME="' . $this->table . '" ORDER BY ORDINAL_POSITION';
 
                

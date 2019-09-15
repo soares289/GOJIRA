@@ -8,14 +8,14 @@
 
       class DataDictionary extends GojiraCore{
          
-         private $conn;  //Conexão com o banco de daods
+         private $connection;  //Conexão com o banco de daods
          
          
           
          //Construtores do objeto
-         function __construct1( $conn ){
+         function __construct1( $connection ){
 
-            $this->conn = $conn;
+            $this->connection = $connection;
 
          }
          
@@ -23,9 +23,9 @@
          function syncDb( $dbName ){
          
             $sql   = 'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = "' . $dbName . '"';
-            $query = $this->conn->query( $sql );
+            $query = $this->connection->query( $sql );
             
-            while( $row = $this->conn->fetch( $query ) ){
+            while( $row = $this->connection->fetch( $query ) ){
                $this->syncTable( $dbName, $row['TABLE_NAME'] );
             }
          
@@ -51,9 +51,9 @@
                            WHERE TABLE_SCHEMA = "' . $dbName . '"
                              AND TABLE_NAME = "' . $tableName . '"';
             
-            $query = $this->conn->query( $sql );
+            $query = $this->connection->query( $sql );
             
-            while( $row = $this->conn->fetch( $query ) ){
+            while( $row = $this->connection->fetch( $query ) ){
             }
             
          }

@@ -30,7 +30,7 @@
             $globals->smarty->assign( 'env'        , $globals->environment );
 
             foreach( $globals as $index => $obj ){
-               if( !preg_match('/db|conn|smarty/i', $index) ){
+               if( !preg_match('/db|database|conn|connection|smarty/i', $index) ){
                   $globals->smarty->assign( $index, $globals->$index );   
                }
             }

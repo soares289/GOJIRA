@@ -46,31 +46,34 @@
       //Define a variavel global, caso ela ainda não exista
       if( !isset( $globals ) )              $globals              = new StdClass();
       if( !isset( $globals->environment ) ) $globals->environment = new StdClass();
-      if( !isset( $globals->db ) ){
-         $globals->db           = new StdClass();
-         $globals->db->host     = '';
-         $globals->db->user     = '';
-         $globals->db->password = '';
-         $globals->db->name     = '';
+      if( !isset( $globals->database ) ){
+         $globals->database           = new StdClass();
+         $globals->database->host     = '';
+         $globals->database->user     = '';
+         $globals->database->password = '';
+         $globals->database->name     = '';
+
+         $globals->db = $globals->database;     //DEPRECADO - na lista de remoção em versões futuras. Carlsom A. Soares - 2019-09-15
       }
 
       //Verifica se tem os dados para conexão
-      if( isset($globals->db->host) && isset($globals->db->user) && isset($globals->db->password) ){
-         $globals->conn = new Connection( $globals->db->host, $globals->db->user, $globals->db->password);
-      } else {
-         $globals->conn = new Connection();
-      }
+      if( isset( $globals->database ) ){
+         
+         $globals->connection = new Connection( $globals->database->host, $globals->database->user, $globals->database->password );
+         
+         //Seleciona o db configurado
+         if( isset( $globals->database->name ) ){
+            $globals->connection->selectDatabase( $globals->database->name );
+         }
 
-      //Seleciona o db configurado
-      if( isset( $globals->db->name ) ){
-         $globals->conn->selectDb( $globals->db->name );
+         $globals->conn = $globals->connection; //DEPRECADO - na lista de remoção em versões futuras. Carlsom A. Soares - 2019-09-15
       }
 
       //Objetos mais comumente usados
       $globals->tools  = new Tool();
       $globals->cfg    = new Config( $absPath );
       $globals->smarty = new Smarty();
-      $globals->login  = new Login( $globals->conn, $globals->tools );
+      $globals->login  = new Login( $globals->connection, $globals->tools );
 
 
       

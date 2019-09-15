@@ -12,19 +12,23 @@
 //CONSTANTES DA CLASSE
 
 //Error msgs
+define( 'DB_CONNECTION_NO_HOST', "Não foi informado um host para conexão com a base de dados" );
 define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
+define( 'DB_CONNECTION_INVALID_SQL', 'Comando sql inválido fornecido para consulta');
+define( 'DB_CONNECTION_INVALID_QUERY', 'Objeto de consulta inválido');
+define( 'DB_CONNECTION_INVALID_TABLE', 'Nome da tabela inválido');
+define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %s');
 
-    
+
       class Connection extends GojiraCore{
     
-         protected $conn;          //Objeto de conexão
-         protected $msg;           //Mensagens de aviso ou erro
+         protected $connection;    //Objeto de conexão
          protected $lastCommand;   //Ultimo comando executado
          
-         protected $db;				//Base de dados em que está conectado
+         protected $database;		//Base de dados em que está conectado
          protected $host;			//Host atual conectado
 			private $user;				//Usuário que foi usado para conectar
-			private $pwd;				//Senha para a base de dados
+			private $password;		//Senha para a base de dados
          
 
          //As propriedades estão ai para manter compatibilidade com sistemas antigos
@@ -36,9 +40,9 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          public $FETCH_NUM    = MYSQLI_NUM;
          
 			
-         function __construct1( $dbHost )                            { $this->connect( $dbHost, '', '' ); }
-         function __construct3( $dbHost, $dbUser, $dbPass )          { $this->connect( $dbHost, $dbUser, $dbPass ); } 
-         function __construct4( $dbHost, $dbUser, $dbPass, $dbName ) { $this->connect( $dbHost, $dbUser, $dbPass, $dbName ); } 
+         function __construct1( $dbHost )                            { $this->configure( $dbHost, '', '' ); }
+         function __construct3( $dbHost, $dbUser, $dbPass )          { $this->configure( $dbHost, $dbUser, $dbPass ); } 
+         function __construct4( $dbHost, $dbUser, $dbPass, $dbName ) { $this->configure( $dbHost, $dbUser, $dbPass, $dbName ); } 
         
          //Destructor força a desconexão do banco de dados;
          //Desativado porque tava dando problema: Como o model extende connection,
@@ -52,47 +56,45 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
         
         
         
-        
-        
-        
-        
          /***   Metodos de SET e GET de valores ***/
-         function get_conn() {        return $this->conn; }
-         function get_connected() {   return $this->isConnected(); }
-         function get_msg() {         return $this->msg; }
+         function get_connection()  { return $this->connection; }
+         function get_connected()   { return $this->isConnected(); }
          function get_lastCommand() { return $this->lastCommand; }
-         function get_lastId() {      return mysqli_insert_id( $this->conn ); }
-			function get_db()          { return $this->db; }
+         function get_lastId()      { return mysqli_insert_id( $this->connection ); }
+			function get_database()    { return $this->database; }
          function get_host()        { return $this->host; }
         
         
         
-        
-        
-        
          /***   Metodos do Objeto ***/
-        
-        
-         //Conecta no banco de dados
-         function connect($dbHost, $dbUser, $dbPass, $dbName = ''){
+         function configure($dbHost, $dbUser, $dbPass, $dbName = ''){
 
-				$this->host = $dbHost;
-				$this->user = $dbUser;
-				$this->pwd  = $dbPass;
-            $this->db   = $dbName;
-            
+            $this->host     = $dbHost;
+            $this->user     = $dbUser;
+            $this->password = $dbPass;
+            $this->database = $dbName;
+
+         }
+        
+
+         //Conecta no banco de dados
+         function connect(){
+
             //Quando não existe o host, identifica como uma sessão sem conexão com o banco
-            if( empty( $dbHost ) ) return false;
-            
-            $conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName );
-            
-            //Verifica se conectou corretamente
-            if(mysqli_connect_errno()){
-               printf(DB_CONNECTION_ERROR, mysqli_connect_error());
+            if( empty( $this->host ) ){
+               throw(new Exception( DB_CONNECTION_NO_HOST ) );
                exit();
             }
             
-            $this->conn = $conn;
+            $connection = new mysqli($this->host, $this->user, $this->password, $this->database );
+            
+            //Verifica se conectou corretamente
+            if(mysqli_connect_errno()){
+               throw(new Exception( sprintf(DB_CONNECTION_ERROR, mysqli_connect_error()) ) );
+               exit();
+            }
+            
+            $this->connection = $connection;
             
             $this->execute("SET NAMES 'utf8'");
             $this->execute('SET character_set_connection=utf8');
@@ -104,13 +106,13 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
 
          //Seleciona a base de dados ativa da coexão
-         function selectDb( $dbName ){
+         function selectDatabase( $dbName ){
 				
-            $this->db = $dbName;
-            $ret      = false;
+            $this->database = $dbName;
+            $ret            = false;
 
             if( $this->connected ){
-               $ret = $this->conn->select_db( $dbName );
+               $ret = $this->connection->select_db( $this->database );
             } 
 
             return $ret;
@@ -124,7 +126,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
             $ret = false;
 
             if( $this->connected ){
-               $ret = @$this->conn->close();
+               $ret = @$this->connection->close();
             }
 
             return $ret;
@@ -135,7 +137,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			function reconnect(){
 				
 				$this->disconnect(); 
-				$this->connect( $this->host, $this->user, $this->pwd, $this->db );
+				return $this->connect();
 				
 			}
 
@@ -144,10 +146,10 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			function isConnected(){
 				
 				//Se não for objeto é por que não está conectado
-				if( ! is_object( $this->conn ) ) return false;
+				if( ! is_object( $this->connection ) ) return false;
 				
 				//Se for objeto, verifica se a conexão está ativa
-				return $this->conn->ping();
+				return $this->connection->ping();
 				
 			}
 
@@ -157,9 +159,6 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
             if( !$this->isConnected() ){
                $this->reconnect();
-               if( !$this->isConnected() ){
-                  throw( new Exception('Cannot connect to the server') );
-               }
             }
 
             return true;
@@ -173,10 +172,10 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 
             $this->lastCommand = $sql;
             
-            $query = $this->conn->query( $sql );
+            $query = $this->connection->query( $sql );
             
             if( !is_object($query) && $query === false ){
-               throw( new Exception('Invalid sql statement supplied for connection query') );
+               throw( new Exception(DB_CONNECTION_INVALID_SQL) );
             }
 
             return $query;
@@ -193,7 +192,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
             $this->lastCommand = $sql;
                         
 				//Executa o comando
-            if( $stmt = $this->conn->prepare( $sql ) ){
+            if( $stmt = $this->connection->prepare( $sql ) ){
                return $stmt->execute();
             }
             
@@ -208,19 +207,19 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
             
             if( ! is_array( $sql ) ) $sql = array( $sql );
             
-            $this->conn->autocommit( false );
-            $this->conn->begin_transaction( MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT );
+            $this->connection->autocommit( false );
+            $this->connection->begin_transaction( MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT );
                
             foreach( $sql as $a ){
                if( ! $this->execute( $a ) ){
-                  $this->conn->rollback(); 
-                  $this->conn->autocommit( true );
+                  $this->connection->rollback(); 
+                  $this->connection->autocommit( true );
                   return false;
                }
             }
             
-            $this->conn->commit();
-            $this->conn->autocommit( true );
+            $this->connection->commit();
+            $this->connection->autocommit( true );
             
             return true;
          }
@@ -230,7 +229,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          function fetch( $query, $type = MYSQLI_ASSOC){
             
             if( ! is_object( $query ) ){
-               throw( new Exception('Invalid query object'));
+               throw( new Exception(DB_CONNECTION_INVALID_QUERY));
             }
             
             if( $type == $this->FETCH_OBJECT ){
@@ -256,7 +255,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          function max( $table, $field ){
             
             if( empty( $table ) || empty( $field ) ){
-               throw( new Exception('Invalid parameters for MAX function') );
+               throw( new Exception( sprintf(DB_CONNECTION_INVALID_PARAMETER, 'MAX') ) );
             }
 
             $this->checkConnection();
@@ -272,7 +271,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          function min( $table, $field ){
             
             if( empty( $table ) || empty( $field ) ){
-               throw( new Exception('Invalid parameters for MIN function') );
+               throw( new Exception(sprintf(DB_CONNECTION_INVALID_PARAMETER, 'MIN')) );
             }
 
             $this->checkConnection();
@@ -309,7 +308,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          function exist( $table, $column = '', $value = '', $compare = ''){
             
             if( empty( $table ) ){
-               throw( new Exception('Invalid parameters for EXIST function') );
+               throw( new Exception(sprintf(DB_CONNECTION_INVALID_PARAMETER, 'EXIST')) );
             }
 
             $this->checkConnection();
@@ -335,12 +334,12 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			function tableExist( $table ){
             
             if( empty( $table ) ){
-               throw( new Exception('Invalid table name') );
+               throw( new Exception(DB_CONNECTION_INVALID_TABLE) );
             }
 
             $this->checkConnection();
 
-				$sql = 'SELECT COUNT(*) AS a FROM information_schema.TABLES WHERE TABLE_SCHEMA="' . $this->db . '" and TABLE_NAME="' . $table . '"';
+				$sql = 'SELECT COUNT(*) AS a FROM information_schema.TABLES WHERE TABLE_SCHEMA="' . $this->database . '" and TABLE_NAME="' . $table . '"';
   				$row = $this->fetch( $this->query( $sql ) );
 
 				return $row['a'] > 0;
@@ -352,12 +351,12 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
 			function fieldExist( $table, $field ){
             
             if( empty( $table ) || empty( $field ) ){
-               throw( new Exception('Invalid parameters for FIELDEXIST function') );
+               throw( new Exception(sprintf(DB_CONNECTION_INVALID_PARAMETER, 'FIELDEXIST')) );
             }
 
             $this->checkConnection();
 
-				$sql = 'select count(*) as a from information_schema.COLUMNS where TABLE_SCHEMA = "' . $this->db . '" and TABLE_NAME="' . $table . '" and COLUMN_NAME="' . $field . '"';
+				$sql = 'select count(*) as a from information_schema.COLUMNS where TABLE_SCHEMA = "' . $this->database . '" and TABLE_NAME="' . $table . '" and COLUMN_NAME="' . $field . '"';
 				$row = $this->fetch( $this->query( $sql ) );
 				
 				return $row['a'] > 0;
@@ -369,7 +368,7 @@ define( 'DB_CONNECTION_ERROR', "Erro ao conectar na base de dados: \n%s\n" );
          function getValue( $table, $field, $compare, $max = 0 ){
             
             if( empty( $table ) || empty( $field ) || empty( $compare ) ){
-               throw( new Exception('Invalid parameters for GETVALUE function') );
+               throw( new Exception(sprintf(DB_CONNECTION_INVALID_PARAMETER, 'GETVALUE')) );
             }
 
             $this->checkConnection();

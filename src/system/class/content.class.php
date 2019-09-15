@@ -7,7 +7,7 @@
    
    class Content extends GojiraCore{
    
-      private $conn;             //Classe de conexão
+      private $connection;             //Classe de conexão
       private $tools;            //Classe com ferramentas necessarias para o funcionamento da classe
          
       /***   Construtores ***/
@@ -23,11 +23,11 @@
          }
       }
           
-      function __construct3( $language, $conn, $tools ) {
+      function __construct3( $language, $connection, $tools ) {
       
-         $this->language = $language;
-         $this->conn     = $conn;
-         $this->tools    = $tools;
+         $this->language   = $language;
+         $this->connection = $connection;
+         $this->tools      = $tools;
          
       } 
       
