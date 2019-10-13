@@ -59,11 +59,11 @@
                switch( $e->getCode() ){
                   case 0x1001:
                   case 0x1011:
+                     header("HTTP/1.0 404 Not Found");
                      if( method_exists( $error, 'error_404' ) ){
                         echo Engine::Render( 'Error', 'error_404', $param );
                         exit;
                      } else {
-                        header("HTTP/1.0 404 Not Found");
                         throw( $e );
                      }
                      break;
@@ -76,11 +76,11 @@
                      }
                      break;
                   case 0x1002:
+                     header('HTTP/1.1 500 Internal Server Error');
                      if( method_exists( $error, 'error_500' ) ){
                         echo Engine::Render( 'Error', 'error_500', $param );
                         exit;
                      } else {
-                        header('HTTP/1.1 500 Internal Server Error');
                         throw( $e );
                      }
                      break;
