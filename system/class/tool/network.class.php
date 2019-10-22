@@ -55,14 +55,19 @@
 			//Envia um email
 			function sendMail( $dest, $subject, $msg, $config ){
             
+            $ret = false;
+
             /*if( !class_exists('PHPMailer', false) ){
                throw(new Exception('PHPMailer not found'));
                exit;
             }*/
 
             if( !isset( $config['from']) ){
-               throw(new Exception('From is required in config array'));
-               exit;
+               if( isset( $config['debug'] ) && $config['debug'] ){
+                  throw(new Exception('From is required in config array'));
+               } else {
+                  return $ret;
+               }
             }
 
             if( !isset( $config['host'] ) )   $config['host'] = 'localhost';
@@ -126,11 +131,15 @@
 					$mail->Subject = $subject;
 					$mail->MsgHTML($msg);
 					$mail->Send();
-
+               $ret = true;
+            
 				} catch (Exception $e) {
-					throw $e;
+					if( isset( $config['debug'] ) && $config['debug'] ){
+                  throw $e;
+               }
 				}
             
+            return $ret;
          }
 
 
@@ -138,7 +147,9 @@
          
          //Usa o php para enviar um email
          function sendMailPHP( $dest, $sub, $msg, $from ){
-      	
+            
+            $ret = false;
+
 				if(PATH_SEPARATOR == ";"){
 					$quebra_linha = "\r\n"; //Se for Windows
 				}else{ 
@@ -157,8 +168,12 @@
             
 				if(!mail($dest, $sub, $msg, $headers ,"-r".$emailsender)){ // Se for Postfix
                $headers .= "Return-Path: " . $emailsender . $quebra_linha; // Se "não for Postfix"
-               mail($dest, $sub, $msg, $headers, $headers );
-				}
+               $ret = mail($dest, $sub, $msg, $headers, $headers );
+				} else {
+               $ret = true;
+            }
+
+            return $ret;
             
          }
          
