@@ -68,6 +68,7 @@
                      }
                      break;
                   case 0x1012:
+                     header('HTTP/1.0 403 Forbidden');
                      if( method_exists( $error, 'error_403' ) ){
                         echo Engine::Render( 'Error', 'error_403', $param );
                         exit;
@@ -85,6 +86,7 @@
                      }
                      break;
                   default:
+                     header('HTTP/1.1 500 Internal Server Error');
                      if( method_exists( $error, 'error_unknow' ) ){
                         echo Engine::Render( 'Error', 'error_unknow', $param );
                         exit;
@@ -93,6 +95,7 @@
                      }
                }
             } else {
+               header('HTTP/1.1 500 Internal Server Error');
                throw( $e );
             }
 
