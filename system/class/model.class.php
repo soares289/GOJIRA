@@ -12,7 +12,7 @@
 			private   $sql = [];       //SQL que deve ser usado na proxima busca
 
          private $mysqlFuncRegex = '';
-         private $mysqlLiteralRegex = '/\b(NULL|CURRENT_TIMESTAMP)\b/ui';      //Palavras reservadas ou nomes de váriaveis que não devem ser escapados
+         private $mysqlLiteralRegex = '/^\b(NULL|CURRENT_TIMESTAMP)\b$/ui';      //Palavras reservadas ou nomes de váriaveis que não devem ser escapados
          private $mysqlFunctions = ['CURRENT_TIMESTAMP','CURDATE','NOW','CURTIME','ADDDATE','ADDTIME','WEEKDAY','WEEKOFYEAR','YEAR','MONTH','DAY','HOUR','MINUTE','SECOND','SEC_TO_TIME','TIME_TO_SEC','STR_TO_DATE','DATEDIFF','TIMEDIFF','DATE_SUB','DAYNAME','DAYOFMONTH', 'DAYOFWEEK','DAYOFYEAR','FROM_DAYS','LAST_DAY', 'MICROSECOND', 'DATE_FORMAT',
                                     'UPPER', 'LOWER', 'TRIM', 'SUBSTR', 'STRCMP', 'SPACE', 'SOUNDS_LIKE', 'SOUNDEX', 'RTRIM', 'RPAD', 'RIGHT', 'LTRIM', 'LPAD', 'LEFT', 'REVERSE', 'REPLACE', 'REGEX', 'QUOTE', 'MID', 'MATCH',
                                     'MIN','MAX','AVG','COUNT','GROUP_CONCAT', 'SUM',
