@@ -649,13 +649,13 @@
                foreach( $key as $i => $a ){
 
                   if( is_string( $i ) ){
-                     $tmp .=  '`' . $i . '` = "' . $a . '"';
+                     $tmp =  '`' . $i . '` = "' . $a . '"';
 
                   } elseif( isset( $primary[ $i ] ) ) {
-                     $tmp .= '`' . $primary[ $i ] . '` = "' . $a . '"';
+                     $tmp = '`' . $primary[ $i ] . '` = "' . $a . '"';
 
                   } elseif( $c < count( $primary ) ){
-                     $tmp .= $primary[ $c ] . '="' . $a . '"';
+                     $tmp = $primary[ $c ] . '="' . $a . '"';
                   }
 
                   if( !empty( $tmp ) ){
