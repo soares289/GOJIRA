@@ -173,9 +173,20 @@
 
          if( empty( $class ) ){
             if( PHP_SAPI === 'cli' ){
-               $class = '';
-               $proc  = '';
-               if( !isset( $param ) ) $param = [];
+               $param = [];
+
+               //O primeiro sempre é o nome do arquivo
+               if( count( $argv ) > 1){
+                  for( $i = 1; $i < count($argv); $i++){
+                     $arg = explode('=', $argv[$i]);
+                     $param[ $arg[0] ] = $arg[1];
+                  }
+               }
+
+               //Se receber o parameto e classe pelos argumentos
+               $class = (isset( $param['class'] ) ? $param['class'] : '');
+               $proc  = (isset( $param['proc'] ) ? $param['proc'] : '');
+
             } else {
                $curr_url  = parse_url( $globals->tools->curPageUrl() );
                $base_url  = parse_url( $globals->environment->baseUrl );
