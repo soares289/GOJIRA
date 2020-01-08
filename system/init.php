@@ -32,7 +32,7 @@
       //Localiza a URL base
       if( !isset( $baseURL )){
          if( PHP_SAPI === 'cli'){
-            $baseUrl = 'cli://';
+            $baseURL = 'cli://';
          } else {
             $baseURL = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL');
 
