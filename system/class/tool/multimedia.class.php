@@ -87,17 +87,17 @@
 		      if( strtolower( $type ) == "youtube" ){
 					
 					if( $url ){
-						$ret = 'http://www.youtube.com/embed/' . $id . '?rel=0&wmode=transparent&autoplay=' . ($autoplay ? 1 : 0);
+						$ret = 'https://www.youtube.com/embed/' . $id . '?rel=0&wmode=transparent&autoplay=' . ($autoplay ? 1 : 0);
 					} else {
-						$ret = '<iframe src="http://www.youtube.com/embed/' . $id . '?rel=0&wmode=transparent&autoplay=' . ($autoplay ? 1 : 0) . '" width="' . $width . '" height="' . $height . '" frameborder="0" allowfullscreen></iframe>';
+						$ret = '<iframe src="https://www.youtube.com/embed/' . $id . '?rel=0&wmode=transparent&autoplay=' . ($autoplay ? 1 : 0) . '" width="' . $width . '" height="' . $height . '" frameborder="0" allowfullscreen></iframe>';
 					}
 				
 				} elseif( strtolower( $type ) == "vimeo" ){
 					
 					if( $url ){
-						$ret = 'http://player.vimeo.com/video/' . $id . '?title=0&amp;byline=0&amp;portrait=0&autoplay=' . ($autoplay ? 1 : 0);
+						$ret = 'https://player.vimeo.com/video/' . $id . '?title=0&amp;byline=0&amp;portrait=0&autoplay=' . ($autoplay ? 1 : 0);
 					} else {
-						$ret = '<iframe src="http://player.vimeo.com/video/' . $id . '?title=0&amp;byline=0&amp;portrait=0&autoplay=' . ($autoplay ? 1 : 0) . '" width="' . $width . '" height="' . $height . '" frameborder="0"></iframe>';
+						$ret = '<iframe src="https://player.vimeo.com/video/' . $id . '?title=0&amp;byline=0&amp;portrait=0&autoplay=' . ($autoplay ? 1 : 0) . '" width="' . $width . '" height="' . $height . '" frameborder="0"></iframe>';
 					}
 				}
 				
@@ -111,11 +111,11 @@
 				
 				if( $videoSrc == "youtube" ){
 					
-					$ret = "http://i1.ytimg.com/vi/" . $videoId . "/default.jpg";
+					$ret = "https://i1.ytimg.com/vi/" . $videoId . "/default.jpg";
 					
 				} elseif( $videoSrc == "vimeo" ) {
 					
-					$json = file_get_contents('http://vimeo.com/api/v2/video/' . $videoId . '.json');
+					$json = file_get_contents('https://vimeo.com/api/v2/video/' . $videoId . '.json');
 					$arr  = json_decode( $json, true );
 					$ret  = $arr[0]['thumbnail_large'];
 					
@@ -155,11 +155,11 @@
 			function issu_get_embed( $id, $width, $height ){
 				
 				$ret = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" style="width: ' . $width . 'px;height: ' . $height . 'px" id="928ddaf9-16fe-a102-ceca-8610fbe6249f" >' .
-			        			'<param name="movie" value="http://static.issuu.com/webembed/viewers/style1/v2/IssuuReader.swf?mode=mini&amp;backgroundColor=%23222222&amp;documentId=' . $id . '" />' .
+			        			'<param name="movie" value="https://static.issuu.com/webembed/viewers/style1/v2/IssuuReader.swf?mode=mini&amp;backgroundColor=%23222222&amp;documentId=' . $id . '" />' .
 				            '<param name="allowfullscreen" value="true"/>' .
 				            '<param name="menu" value="false"/>' .
 				            '<param name="wmode" value="transparent"/>' .
-			            	'<embed src="http://static.issuu.com/webembed/viewers/style1/v2/IssuuReader.swf" type="application/x-shockwave-flash" allowfullscreen="true" menu="false" wmode="transparent" ' .
+			            	'<embed src="https://static.issuu.com/webembed/viewers/style1/v2/IssuuReader.swf" type="application/x-shockwave-flash" allowfullscreen="true" menu="false" wmode="transparent" ' .
 			                     'style="width:' . $width . 'px;height:' . $height . 'px" ' .
 			                     'flashvars="mode=mini&amp;backgroundColor=%23222222&amp;documentId=' . $id . '" /></object>';
 				return $ret;

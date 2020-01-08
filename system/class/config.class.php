@@ -46,7 +46,7 @@
 			
 			
 			//Busca configuraçoes da base de dados
-			function getConfig( $class, $id = '', $def = '' ){
+			function getConfig( $class, $id = '', $def = null ){
 				
 				$ret = $def;
 				
@@ -66,7 +66,7 @@
                   $ret = $this->cache[ $class ][ $id ];
                
                //Caso contrario, cria no arquivo
-               } else {
+               } elseif( !is_null( $def ) ) {
                   $this->cache[ $class ][ $id ] = $def;
                   $this->save();
                }

@@ -1,5 +1,4 @@
 <?php
-//TODO - Remover a pasta JS do sistema, pensar em algo melhor pra fazer com aquilo
 
       @session_start();
 
@@ -10,22 +9,6 @@
 
       //Se não existir, cria agora
       if( !isset( $systemPath ) ) $systemPath = str_replace( "\\", "/", dirname(__FILE__) ) . '/';
-
-      //Localiza a URL base
-      if( !isset( $baseURL )){
-         $baseURL = $_SERVER['SERVER_NAME'] . (isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '');
-         $baseURL = substr( $baseURL, 0, min(strrpos( $baseURL, '/' ), strlen( $baseURL )) );
-         if( substr( $baseURL, -1, 1 ) != '/' ) $baseURL .= '/';
-      }
-
-      //Se não tiver a url do sistema, gera agora
-      //Em boa parte dos casos vai ser assim, mas talvez tenha como deixar isso mais preciso
-      if( ! isset( $systemURL ) ) $systemURL = $baseURL . 'system/';
-
-      //Configurações globais
-      ini_set("default_socket_timeout", 60);
-      ob_start();
-      date_default_timezone_set('America/Sao_Paulo');
 
       //Classes BASE usadas por quase tudo
       require_once( $systemPath . 'class/gojiracore.class.php' );
@@ -39,6 +22,39 @@
       require_once( $systemPath . 'class/collection.class.php' );
       require_once( $systemPath . 'class/engine.class.php' );
       require_once( $systemPath . 'class/smarty-3.1.33/libs/Smarty.class.php' );
+
+
+      //Objetos mais comumente usados
+      $globals->tools  = new Tool();
+      $globals->cfg    = new Config( $absPath );
+      $globals->smarty = new Smarty();
+
+      //Localiza a URL base
+      if( !isset( $baseURL )){
+         if( PHP_SAPI === 'cli'){
+            $baseUrl = 'cli://';
+         } else {
+            $baseURL = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL');
+
+            if( empty( $baseURL ) ){
+               $baseURL = $_SERVER['SERVER_NAME'] . (isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '');
+               $baseURL = substr( $baseURL, 0, min(strrpos( $baseURL, '/' ), strlen( $baseURL )) );
+               if( substr( $baseURL, -1, 1 ) != '/' ) $baseURL .= '/';
+
+               $globals->cfg->setConfig(PROJECT_ID . '_ENGINE', 'BASE_URL', $baseURL);
+            }
+         }
+      }
+
+      //Se não tiver a url do sistema, gera agora
+      //Em boa parte dos casos vai ser assim, mas talvez tenha como deixar isso mais preciso
+      if( ! isset( $systemURL ) ) $systemURL = $baseURL . 'system/';
+
+      //Configurações globais
+      ini_set("default_socket_timeout", 60);
+      ob_start();
+      date_default_timezone_set('America/Sao_Paulo');
+
 
 
 //Seta as globais
@@ -69,26 +85,18 @@
          $globals->conn = $globals->connection; //DEPRECADO - na lista de remoção em versões futuras. Carlsom A. Soares - 2019-09-15
       }
 
-      //Objetos mais comumente usados
-      $globals->tools  = new Tool();
-      $globals->cfg    = new Config( $absPath );
-      $globals->smarty = new Smarty();
       $globals->login  = new Login( $globals->connection, $globals->tools );
 
-
-      
-      
-
-      $protocol = 'http' . (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on" ? 's' : '');
 
       //Dados referentes ao environment do sistema - Paths e Urls
 
       /* Protocolo atual */
-      $globals->environment->protocol         = $protocol;
+      $protocol                       = 'http' . (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on" ? 's' : '');
+      $globals->environment->protocol = $protocol;
       
       //Base do sistema
       $globals->environment->absPath          = $absPath;
-      $globals->environment->baseUrl          = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL'      , $baseURL );
+      $globals->environment->baseUrl          = $protocol . '://' . $baseURL;
 
       //webroot / acessivel pela url
       $globals->environment->rootUrl          = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_URL'      , $baseURL . 'webroot/' );
@@ -158,21 +166,21 @@
          //Cria os parametos base para o engine.php
          //É possivel agora enviar isso via post diretamente
          //Ex: $.post(baseURL + "home/index/",{},function(data){});
-
-         //Filtra o protocolo que está sendo usado
-         $protocol = 'http';
-         if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") {
-            $protocol .= "s";
-         }
-
-         $curr_url  = parse_url( $globals->tools->curPageUrl() );
-         $base_url  = parse_url( $globals->environment->baseUrl );
          
          if( isset( $_GET['query'] ) ){
             list( $class, $proc, $param) = $globals->tools->queryToParam( $_GET['query'] );
          }
+
          if( empty( $class ) ){
-            list( $class, $proc, $param) = $globals->tools->queryToParam( substr( $curr_url['path'], strlen($base_url['path']) ) );
+            if( PHP_SAPI === 'cli' ){
+               $class = '';
+               $proc  = '';
+               if( !isset( $param ) ) $param = [];
+            } else {
+               $curr_url  = parse_url( $globals->tools->curPageUrl() );
+               $base_url  = parse_url( $globals->environment->baseUrl );
+               list( $class, $proc, $param) = $globals->tools->queryToParam( substr( $curr_url['path'], strlen($base_url['path']) ) );
+            }
          }
          
       }
