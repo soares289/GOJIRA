@@ -5,10 +5,9 @@
       define('GOJIRA_VERSION', '0.9.4');
 
       //Precisa saber a pasta do sistema que está sendo iniciado
-      if( !isset( $absPath ) ) throw( new Exception('$absPath não localizado') );
+      if( !isset( $absPath ) ) throw( new Exception('$absPath não localizado, configure a pasta base do projeto') );
 
-      //Se não existir, cria agora
-      if( !isset( $systemPath ) ) $systemPath = str_replace( "\\", "/", dirname(__FILE__) ) . '/';
+      $systemPath = str_replace( "\\", "/", __DIR__) . '/';
 
       //Classes BASE usadas por quase tudo
       require_once( $systemPath . 'class/gojiracore.class.php' );
@@ -29,22 +28,20 @@
       $globals->cfg    = new Config( $absPath );
       $globals->smarty = new Smarty();
 
-      //Localiza a URL base
-      if( !isset( $baseURL )){
+      $baseURL = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL');
+      if( empty( $baseURL ) ){
          if( PHP_SAPI === 'cli'){
             $baseURL = 'cli://';
+
          } else {
-            $baseURL = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL');
+            $baseURL = $_SERVER['SERVER_NAME'] . (isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '');
+            $baseURL = substr( $baseURL, 0, min(strrpos( $baseURL, '/' ), strlen( $baseURL )) );
+            if( substr( $baseURL, -1, 1 ) != '/' ) $baseURL .= '/';
 
-            if( empty( $baseURL ) ){
-               $baseURL = $_SERVER['SERVER_NAME'] . (isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '');
-               $baseURL = substr( $baseURL, 0, min(strrpos( $baseURL, '/' ), strlen( $baseURL )) );
-               if( substr( $baseURL, -1, 1 ) != '/' ) $baseURL .= '/';
-
-               $globals->cfg->setConfig(PROJECT_ID . '_ENGINE', 'BASE_URL', $baseURL);
-            }
+            $globals->cfg->setConfig(PROJECT_ID . '_ENGINE', 'BASE_URL', $baseURL);
          }
       }
+
 
       //Se não tiver a url do sistema, gera agora
       //Em boa parte dos casos vai ser assim, mas talvez tenha como deixar isso mais preciso
@@ -52,7 +49,7 @@
 
       //Configurações globais
       ini_set("default_socket_timeout", 60);
-      ob_start();
+      if( PHP_SAPI !== 'cli' ) ob_start();
       date_default_timezone_set('America/Sao_Paulo');
 
 
@@ -153,6 +150,7 @@
          class AppModel extends Model{};
       }
 
+      
       //Cria os parametos de inicialização das classes
       if( isset( $_POST['class'] ) ){
          //Para requisições ajax

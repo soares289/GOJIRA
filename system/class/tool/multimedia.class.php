@@ -83,7 +83,9 @@
 		
 		   //Adiciona um embeded do youtube ou Vimeo
 		   function embedVideo( $id, $width, $height, $type = "youtube", $autoplay = false, $url = false ){
-		
+      
+            $ret = '';
+            
 		      if( strtolower( $type ) == "youtube" ){
 					
 					if( $url ){

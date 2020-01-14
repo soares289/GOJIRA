@@ -49,6 +49,7 @@
                
                if( class_exists( $class ) ){
                   $objController = new $class( $globals );
+                  $objController->onLoad();
                   return $objController;
                
                } else {
@@ -129,7 +130,11 @@
             
          }
             
-         
+
+         //Executa quando o objeto é instanciado
+         function onLoad(){}
+
+
          //Executa antes do método chamado ser executado
          function beforeCall( $class, $method, $param ){
             return true;

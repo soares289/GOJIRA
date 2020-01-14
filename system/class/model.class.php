@@ -70,6 +70,7 @@
                require_once( $dir . $file );
                try{
                   $objModel = new $class( $globals );
+                  $objModel->onLoad();
                   return $objModel;
                } catch( Exception $e ){
                   throw( new ModelException( "Error in instantiation of Model <strong>\"" . $class . "\"</strong> MSG: " . $e->getMessage(), 0x2002 ) );
@@ -107,6 +108,8 @@
             return $ret;
          }
 
+         //Executa ao carregar o model
+         function onLoad(){}
 
 			//Adiciona um campo na consulta SQL
 			protected function field( $name, $alias = '', $table = '' ){ $this->sql['field'][] = array( $name, $alias, $table ); return $this; }
