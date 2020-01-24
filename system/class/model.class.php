@@ -411,6 +411,7 @@
 					$sql .= ' ORDER BY ' . $sort;
 				}
 
+
 				//Caso seja preciso passar um limit de registros
 				if( is_array( $limit ) ) $limit = $limit[0] . (isset( $limit[1] ) ? ', ' . $limit[1] : '');
 				if( !empty( $limit ) )   $sql .= ' LIMIT ' . $limit;
