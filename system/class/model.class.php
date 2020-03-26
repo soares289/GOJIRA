@@ -45,7 +45,7 @@
 			//propriedades do objeto
 			//$table
 			function set_table( $val ){
-            $this->table      = $val;
+            $this->table     = $val;
             $this->structure = null;
 			}
 			function get_table(){ return $this->table; }
@@ -326,7 +326,7 @@
             
             $sql  =  'SELECT COLUMN_NAME AS `name`, ' .
                            'COLUMN_DEFAULT as `default`, ' .
-                           'COLUMN_DEFAULT IS NULL as `default_is_null`, ' .
+                           'COLUMN_DEFAULT IS NULL OR COLUMN_DEFAULT = "NULL" as `default_is_null`, ' .
                            'IS_NULLABLE = "YES" AS `null`, ' .
                            'DATA_TYPE AS `type`, ' .
                            'IF(CHARACTER_MAXIMUM_LENGTH IS NULL, NUMERIC_PRECISION, CHARACTER_MAXIMUM_LENGTH) AS `length`, ' .
@@ -415,8 +415,9 @@
 				//Caso seja preciso passar um limit de registros
 				if( is_array( $limit ) ) $limit = $limit[0] . (isset( $limit[1] ) ? ', ' . $limit[1] : '');
 				if( !empty( $limit ) )   $sql .= ' LIMIT ' . $limit;
-
+            
 				if( $this->count( $sql ) > 0 ){
+               
                $query = $this->query( $sql );
                $data  = $this->makeDataObject( $query, false, ($usePrimary ? $primary : null) );
 				}
@@ -453,11 +454,13 @@
             }
 
 				foreach( $this->structure as $a ){
+               $default = preg_replace("/[\'\\\"]/", "", $a->default_value);
+               
                if( $lArray ){
-                  $row[ $a->name ] = ($a->default_is_null ? NULL : $a->default_value);
+                  $row[ $a->name ] = ($a->default_is_null ? NULL : $default);
                } else {
                   $key       = ($a->name);
-                  $row->$key = ($a->default_is_null ? NULL : $a->default_value);
+                  $row->$key = ($a->default_is_null ? NULL : $default);
                }
 				}
 
@@ -562,7 +565,6 @@
 					$sql     = 'INSERT INTO `' . $table . '`(' . $header . ') VALUES(' . $sql . ')';
 				}
             
-
             //Não executa o insert, retorna o sql
             if( $retCommand ){
                return $sql;
