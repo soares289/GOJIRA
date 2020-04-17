@@ -35,7 +35,7 @@
 
             $this->resetCommand();
 
-            $this->mysqlFuncRegex = '/(' . implode('|',$this->mysqlFunctions) . ')\(.*\)/ui';
+            $this->mysqlFuncRegex = '/^\b(' . implode('|',$this->mysqlFunctions) . ')\b\(.*\)$/ui';
 
 			}
 
