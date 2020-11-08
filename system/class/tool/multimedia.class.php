@@ -68,8 +68,9 @@
 		      if( !preg_match('/vimeo\./i', $url) ){
 		         return '';
 		      }
-				
-				$id = end( explode( "/", $url ) );
+            
+            $piece = explode( "/", $url );
+				$id = end( $piece );
 				
 				if( strlen( $id ) < 8 ){
 					return '';
@@ -112,15 +113,22 @@
 			function getVideoThumb( $videoId, $videoSrc ){
 				
 				if( $videoSrc == "youtube" ){
-					
-					$ret = "https://i1.ytimg.com/vi/" . $videoId . "/default.jpg";
-					
+               
+               $res = ['maxresdefault', 'mqdefault', 'sddefault', 'default'];
+               foreach( $res as $a ){
+                  $ret     = 'https://i1.ytimg.com/vi/' . $videoId . '/' . $a  . '.jpg';
+                  $headers = @get_headers($ret);
+                  if($headers && strpos( $headers[0], '200')) break;
+               }
+
 				} elseif( $videoSrc == "vimeo" ) {
 					
 					$json = file_get_contents('https://vimeo.com/api/v2/video/' . $videoId . '.json');
-					$arr  = json_decode( $json, true );
-					$ret  = $arr[0]['thumbnail_large'];
-					
+               $arr  = json_decode( $json, true );
+               
+               if(     isset( $arr[0]['thumbnail_large'] ) ) { $ret = $arr[0]['thumbnail_large']; }
+               elseif( isset( $arr[0]['thumbnail_medium'] ) ){ $ret = $arr[0]['thumbnail_medium']; }
+               else                                          { $ret = $arr[0]['thumbnail_small']; }
 				}
 				
 				return $ret;

@@ -120,7 +120,7 @@
 				try {
 
                //Configura o smtp
-					$mail->SMTPDebug  = 0;                                   // enables SMTP debug information (for testing)
+					$mail->SMTPDebug  = isset( $config['debug'] ) && $config['debug'] ? 2 : 0; // enables SMTP debug information (for testing)
                $mail->SMTPSecure = $config['secure'];  //"ssl";//"tls";             // sets the prefix to the servier
 					$mail->Host       = $config['host'];                               // sets GMAIL as the SMTP server
 					$mail->Port       = $config['port'];                               // set the SMTP port for the GMAIL server
