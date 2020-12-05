@@ -684,7 +684,7 @@
 
             if( is_null( $value ) ) return $value;
 
-            if( strpos( '[char][varchar][enum][blog][mediumblob][bigblob][tinyblob][smallblob][text][mediumtext][bigtext][tinytext][smalltext]', $format->field_type ) ){
+            if( strpos( '[char][varchar][enum][blog][mediumblob][longblob][tinyblob][smallblob][text][mediumtext][longtext][tinytext][smalltext]', $format->field_type ) ){
                $value = $tools->antiInjection( $value, true, true );
             } else {
                $value = $tools->antiInjection( $value );
