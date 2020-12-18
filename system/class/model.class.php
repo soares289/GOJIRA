@@ -115,7 +115,7 @@
 			protected function field( $name, $alias = '', $table = '' ){ $this->sql['field'][] = array( $name, $alias, $table ); return $this; }
 
 			//From - No caso de fazer um select de outra tabela, sem precisar mudar o campo TABLE
-			protected function from( $table ){ $this->sql['table'] = $table; return $this; }
+			protected function from( $table, $alias = 'a' ){ $this->sql['table'] = [$table, $alias]; return $this; }
 
 			//Comparações
 			protected function where( $field, $compare, $value ){ $this->sql['where'][] = array($field, $compare, $value ); return $this; }
@@ -164,8 +164,9 @@
 							  $a[0] . (empty( $a[1] ) ? '' : ' AS "' . $a[1] . '"');
 				}
 
-            $table = (isset( $obj->sql['table'] ) ? $obj->sql['table'] : $obj->table);
-				$sql .= ' FROM ' . (is_object( $table ) ? '(' . $this->makeCommand($table) . ')' : '`' . $table . '`') . ' as a';
+            $table = (isset( $obj->sql['table'] ) ? $obj->sql['table'][0] : $obj->table);
+            $alias = (isset( $obj->sql['table'] ) ? $obj->sql['table'][1] : 'a');
+				$sql .= ' FROM ' . (is_object( $table ) ? '(' . $this->makeCommand($table) . ')' : '`' . $table . '`') . ' as `' . $alias . '` ';
 
 				//parte dos joins
 				if( isset( $obj->sql[ 'join' ] ) && count( $obj->sql[ 'join' ] ) > 0 ){
