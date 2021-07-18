@@ -2,7 +2,7 @@
 
       @session_start();
 
-      define('GOJIRA_VERSION', '0.9.4');
+      define('GOJIRA_VERSION', '0.9.5');
 
       //Precisa saber a pasta do sistema que está sendo iniciado
       if( !isset( $absPath ) ) throw( new Exception('$absPath não localizado, configure a pasta base do projeto') );
@@ -87,8 +87,8 @@
 
       //Dados referentes ao environment do sistema - Paths e Urls
 
-      /* Protocolo atual */
-      $protocol                       = 'http' . (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on" ? 's' : '');
+      /* Protocolo atual - Se HTTPS tiver on ou tiver rodando via client, protocolo será https */
+      $protocol                       = 'http' . ((isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") || PHP_SAPI === 'cli' ? 's' : '');
       $globals->environment->protocol = $protocol;
       
       //Base do sistema

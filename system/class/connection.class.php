@@ -243,9 +243,13 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
          
          
          //Carrega todo o resultset em um array
-         function fetchAll( $query, $type = MYSQLI_ASSOC ){
+         function fetchAll( $query, $type = MYSQLI_ASSOC, $map_function = null ){
             
-            for($set = array (); $row = $this->fetch( $query, $type ); $set[] = $row);
+            if( is_object( $map_function ) ){
+               for($set = []; $row = $this->fetch( $query, $type ); $set[] = $map_function($row));               
+            } else {
+               for($set = []; $row = $this->fetch( $query, $type ); $set[] = $row);
+            }
             
             return $set;
          }
