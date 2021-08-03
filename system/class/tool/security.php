@@ -89,10 +89,10 @@
             
             $encode = mb_detect_encoding($str.'x', 'UTF-8, ISO-8859-1');
             if( $encode != 'UTF-8' ) $str = mb_convert_encoding( $str, 'UTF-8', $encode );
-            
-				$str = trim(mb_strtolower($str,'UTF-8'));
-				$char 	= array(" ","ç","á","é","í","ó","ú","ä","ë","ï","ö","ü","à","è","ì","ò","ù","â","ê","î","ô","û","ã","õ");
-				$replace = array("-","c","a","e","i","o","u","a","e","i","o","u","a","e","i","o","u","a","e","i","o","u","a","o");
+            $str     = stripslashes(strip_tags($str));
+				$str     = trim(mb_strtolower($str,'UTF-8'));
+				$char 	= array(" ","ç","á","é","í","ó","ú","ä","ë","ï","ö","ü","à","è","ì","ò","ù","â","ê","î","ô","û","ã","õ","\r","\n");
+				$replace = array("-","c","a","e","i","o","u","a","e","i","o","u","a","e","i","o","u","a","e","i","o","u","a","o", "", "-");
             $regex   = '/[^\d^\w^-]/';
 				
             $ret = str_replace($char,$replace, $str);
