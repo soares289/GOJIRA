@@ -744,7 +744,7 @@
                }
 
             } else {
-               $ret = '"' . addslashes(stripslashes($value)) . '"';
+               $ret = '"' . addslashes($value) . '"';
             }
 
 				return $ret;
