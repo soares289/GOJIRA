@@ -559,8 +559,8 @@
 					$header = '';
 					foreach( $structure as $col ){
 						if( ! ($col->is_auto_increment && $this->sqlField( $col, $row[ $col->name ] ) == 'NULL' ) ){
-							$header .= (empty( $sql ) ? '' : ', ') . '`' . $col->name . '`';
-							$sql    .= (empty( $sql ) ? '' : ', ') . $this->sqlField( $col, $row[ $col->name ] );
+							$header .= (empty( $header ) ? '' : ', ') . '`' . $col->name . '`';
+							$sql    .= (empty( $header ) ? '' : ', ') . $this->sqlField( $col, $row[ $col->name ] );
 						}
 					}
 					$sql     = 'INSERT INTO `' . $table . '`(' . $header . ') VALUES(' . $sql . ')';
