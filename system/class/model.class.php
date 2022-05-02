@@ -545,7 +545,7 @@
 					//É uma alteração
 					foreach( $structure as $col ){
 						if( ! ( ($col->is_auto_increment || $col->is_primary_key) && $this->sqlField( $col, $row[ $col->name ] ) == 'NULL' ) ){
-							$sql .= (empty( $sql ) ? '' : ', ' );
+							$sql .= ($sql == '' ? '' : ', ' );
 							$sql .= '`' . $col->name . '`=' . $this->sqlField( $col, $row[ $col->name ]);
 						}
 					}
@@ -559,8 +559,8 @@
 					$header = '';
 					foreach( $structure as $col ){
 						if( ! ($col->is_auto_increment && $this->sqlField( $col, $row[ $col->name ] ) == 'NULL' ) ){
-							$header .= (empty( $header ) ? '' : ', ') . '`' . $col->name . '`';
-							$sql    .= (empty( $header ) ? '' : ', ') . $this->sqlField( $col, $row[ $col->name ] );
+							$header .= ($sql == '' ? '' : ', ') . '`' . $col->name . '`';
+							$sql    .= ($sql == '' ? '' : ', ') . $this->sqlField( $col, $row[ $col->name ] );
 						}
 					}
 					$sql     = 'INSERT INTO `' . $table . '`(' . $header . ') VALUES(' . $sql . ')';
