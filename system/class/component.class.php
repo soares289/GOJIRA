@@ -58,11 +58,20 @@
                   $modelObj = new AppModel( $globals );
                }
 
+               if( method_exists( $modelObj, 'onLoad') ){
+                  $modelObj->onLoad();
+               }
+
                require_once( $controllerDir . $file );
 
                try{
 
                   $controllerObj = new $controllerClass( $globals, $modelObj );
+                  
+                  if( method_exists( $controllerObj, 'onLoad') ){
+                     $controllerObj->onLoad();
+                  }
+
                   return $controllerObj;
 
                } catch( Exception $e ){
