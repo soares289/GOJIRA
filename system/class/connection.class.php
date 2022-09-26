@@ -100,7 +100,8 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
             $this->execute('SET character_set_connection=utf8');
             $this->execute('SET character_set_client=utf8');
             $this->execute('SET character_set_results=utf8');
-            
+            $this->execute('SET lc_time_names=pt_BR');
+
             return $this;
          }
 

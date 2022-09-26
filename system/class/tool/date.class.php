@@ -129,4 +129,25 @@
 
          }
 		
+
+         
+         //Retorna uma string com o tempo decorrido (ex: 4 minutos)
+         function timeElapsed($sec){
+
+            if( $sec <= 1 ) 'Agora mesmo';
+
+            $date = [    'ano' => 31536000,
+                         'mes' =>  2592000,
+                         'dia' =>    86400,
+                        'hora' =>     3600,
+                      'minuto' =>       60,
+                     'segundo' =>        1];
+      
+            foreach( $date as $name => $time ){
+               $qtde = $sec / $time;
+               if( $qtde >= 1 ) return 'há ' . floor( $qtde ) . ' ' . $name . ($qtde > 2 ? 's' : '');
+            }
+
+         }
+
 		}
