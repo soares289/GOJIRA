@@ -251,6 +251,7 @@
 				$obj->sql     = $this->sql;
 				$obj->table   = $this->table;
 				$obj->command = $this->makeCommand();
+            
 				if( $lReset ) $this->resetCommand();
 
 				return $obj;
@@ -455,7 +456,7 @@
             }
 
 				foreach( $this->structure as $a ){
-               $default = preg_replace("/[\'\\\"]/", "", $a->default_value);
+               $default = preg_replace("/[\'\\\"]/", "", $a->default_value ?? '');
                
                if( $lArray ){
                   $row[ $a->name ] = ($a->default_is_null ? NULL : $default);
@@ -693,7 +694,7 @@
 
 
 				//Formatando as datas para o formato mysql
-            if( $value != 'NULL'  && ! preg_match( $this->mysqlFuncRegex, $value ) ){
+            if( $value != 'NULL'  && ! preg_match( $this->mysqlFuncRegex, $value ?? '' ) ){
 
                if( ($format->field_type == 'datetime' || $format->field_type == 'timestamp') && (strlen( $value ) == 16 || strlen( $value ) == 19) ){
                   $value = $tools->dateToSql( $value, true );

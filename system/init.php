@@ -20,7 +20,7 @@
       require_once( $systemPath . 'class/model.class.php' );
       require_once( $systemPath . 'class/collection.class.php' );
       require_once( $systemPath . 'class/engine.class.php' );
-      require_once( $systemPath . 'class/smarty-3.1.33/libs/Smarty.class.php' );
+      require_once( $systemPath . 'class/smarty-4.3.0/libs/Smarty.class.php' );
 
 
       //Objetos mais comumente usados

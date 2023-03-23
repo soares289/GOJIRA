@@ -13,7 +13,7 @@
 		   	
 				if( !$lHtml ) {
 			      
-					$str = preg_replace("/(from|alter table|select|insert|delete|update| where|drop table|show tables|\*|--|\\\\)/i","",$str);
+					$str = preg_replace("/(from|alter table|select|insert|delete|update| where|drop table|show tables|\*|--|\\\\)/i","", $str ?? '');
 			      $str = trim($str);//limpa espaços vazio
 			
 					//Se o segundo parametro for true, remove as tags html
@@ -36,7 +36,7 @@
          function removePhone( $text, $replacement = '********' ){
             
             $pattern = '/([\(\+]{0,1}[0-9o]{2,3}[\)]{0,1}[\s\-\_\+]{0,2}){0,2}[0-9]{4,5}[\-\s]{0,1}[0-9]{4}/i';
-            $ret     = preg_replace( $pattern, $replacement, $text );
+            $ret     = preg_replace( $pattern, $replacement, $text ?? '' );
             /* Formatos testados
                (+55) (011) 99999-9999 (com ou sem hifen) (com ou sem parenteses)
                9999-9999
@@ -52,7 +52,7 @@
          function removeEmail( $text, $replacement = '********' ){
 
             $pattern = '/([a-zA-Z0-9_\-\.\!\?\"]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)/i';
-            $ret     = preg_replace( $pattern, $replacement, $text );
+            $ret     = preg_replace( $pattern, $replacement, $text ?? '');
 
             return $ret;
          }
@@ -63,7 +63,7 @@
 
             //Regex basica para remover apenas urls bem formatadas (com http e tudo mais). Mais simples e mais rápida.
             $pattern = '/(https?):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/i';
-            $text    = preg_replace( $pattern, $replacement, $text );
+            $text    = preg_replace( $pattern, $replacement, $text ?? '' );
 
             //Faz uma filtragem mais profunda. É mais lento mas consegue remover urls mal formatadas (sem http, sem www, etc)
             if( $deep ){
@@ -95,7 +95,7 @@
 				$replace = array("-","c","a","e","i","o","u","a","e","i","o","u","a","e","i","o","u","a","e","i","o","u","a","o", "", "-");
             $regex   = '/[^\d^\w^-]/';
 				
-            $ret = str_replace($char,$replace, $str);
+            $ret = str_replace($char,$replace, $str ?? '');
             $ret = preg_replace($regex, '', $ret );
 
             while( strpos($ret, '--') !== false ) $ret = str_replace( '--', '-', $ret );
@@ -109,10 +109,10 @@
 			function clean( $str ){
 				
 				$encode = mb_detect_encoding($str.'x', 'UTF-8, ISO-8859-1');
-				if( $encode != 'UTF-8' ) $str = mb_convert_encoding( $str, 'UTF-8', $encode );
+				if( $encode != 'UTF-8' ) $str = mb_convert_encoding( $str ?? '', 'UTF-8', $encode );
 				
 				//return strtolower( $str );
-				$str     = trim(mb_strtolower($str, 'UTF-8'));
+				$str     = trim(mb_strtolower($str ?? '', 'UTF-8'));
 				$char 	= array("ç","á","é","í","ó","ú","ä","ë","ï","ö","ü","à","è","ì","ò","ù","â","ê","î","ô","û","ã","õ","!","@","#","$","%","^","&","*","(",")","_","=","+","[","]","{","}","\\","|","/","?","<",">",".",",","\"","'",'-',':');
 				$replace = array("c","a","e","i","o","u","a","e","i","o","u","a","e","i","o","u","a","e","i","o","u","a","o", "", "", "", "", "", "", "", "", "", "","_", "", "", "", "", "", "",  "", "", "", "", "", "", "", "",  "", "",'','');
 

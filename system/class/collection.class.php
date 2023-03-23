@@ -3,24 +3,24 @@
       ~~ Carlsom A. - 2017-03-21
 */
 
-		abstract class Customization implements IteratorAggregate, Serializable, Countable, ArrayAccess{
+		abstract class Customization implements IteratorAggregate, Countable, ArrayAccess{
 
-			protected $collection_data = array();
+			protected $collection_data = [];
 			protected $structure;
 
 
 			//Para podeer usar no FOREACH
-			function getIterator(){	return new ArrayIterator( $this->collection_data ); }
+			function getIterator() : Traversable{	return new ArrayIterator( $this->collection_data ); }
 
 			//Para ter opção de serializar e dessserializar a data
-			public function serialize(){           return serialize($this->collection_data);    }
-			public function unserialize($data) {   $this->collection_data = unserialize($data); }
+         public function __serialize(): array { return $this->collection_data; }
+         public function __unserialize(array $data): void { $this->collection_data = $data; }
 
 			//Para poder usar o count do array
-			public function count(){ return count( $this->collection_data ); }
+			public function count() :int{ return count( $this->collection_data ); }
 
 			//Para poder usar o objeto como array
-			public function offsetSet( $index, $value) {
+			public function offsetSet( $index, $value): void {
 
 		   	if (is_null($index)) {
 		   		$this->collection_data[] = $this->defField( $value, null );
@@ -36,13 +36,13 @@
 		   }
 
 			//Para verificar se existe o campo no array( com o isset );
-		   public function offsetExists( $index ){ return isset($this->collection_data[$index]); }
+		   public function offsetExists( $index ): bool{ return isset($this->collection_data[$index]); }
 
 			//Remover campos com o unset
-		   public function offsetUnset($index)   { unset( $this->collection_data[$index] ); }
+		   public function offsetUnset($index): void { unset( $this->collection_data[$index] ); }
 
 			//buscar valores dentro do objeto
-		   public function offsetGet($index)     {
+		   public function offsetGet($index): mixed    {
 				if( !isset($this->collection_data[$index]) ){
 					$this->collection_data[$index] = $this->defField( $index, null );
 				}
@@ -90,9 +90,12 @@
 		}
 
 
-		class CustomData extends Customization{
+		class CustomData{
 
-			protected $rows = array();
+			protected $rows = [];
+         
+         public function __serialize(): array { return $this->rows; }
+         public function __unserialize(array $data): void { $this->rows = $data; }
 
 			function __construct( $structure ){
 

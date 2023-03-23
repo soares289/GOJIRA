@@ -39,10 +39,10 @@
             //Renderiza o view
             if( file_exists( $globals->environment->viewPath . $file ) ){
                return $globals->smarty->fetch( $file );
-
+            } elseif( is_object($objData) || is_array($objData) ){
+               return json_encode( $objData );
             } elseif( !is_object( $objData ) ){
                return $objData;
-
             }
 
          
