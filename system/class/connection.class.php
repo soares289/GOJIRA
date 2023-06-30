@@ -320,7 +320,7 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
 
             $sql = '';
 
-            if( !empty( $column  ) ) $sql .= '`' . $column . '`' . ( strtolower($value) == 'null' || is_null($value) ? ' IS NULL ' : '="' . $value . '" ');
+            if( !empty( $column  ) ) $sql .= '`' . $column . '`' . ( strtolower($value ?? '') == 'null' || is_null($value) ? ' IS NULL ' : '="' . $value . '" ');
             if( !empty( $compare ) ) $sql .= (empty( $sql ) ? '' : ' AND ') . $compare;
             if( !empty( $sql     ) ) $sql = 'SELECT COUNT(*) AS a FROM `' . $table . '` WHERE ' . $sql;
 
