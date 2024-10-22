@@ -10,10 +10,10 @@
 			
 			//Remove conteudo que pode ser usado para sql_injection de uma query
 		   function antiInjection($str, $lTags = false, $lHtml = false) {
-		   	
+	   	
 				if( !$lHtml ) {
 			      
-					$str = preg_replace("/(from|alter table|select|insert|delete|update| where|drop table|show tables|\*|--|\\\\)/i","", $str ?? '');
+					$str = preg_replace("/(alter table|insert into|delete from|update table|drop table|show tables|\*|--|\\\\)/i","", $str ?? '');
 			      $str = trim($str);//limpa espaços vazio
 			
 					//Se o segundo parametro for true, remove as tags html

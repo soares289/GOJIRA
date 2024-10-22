@@ -73,7 +73,7 @@
             if( !isset( $config['host'] ) )   $config['host'] = 'localhost';
             if( !isset( $config['port'] ) )   $config['port'] = '587';
             if( !isset( $config['secure'] ) ) $config['secure'] = 'tls';
-            if( !isset( $config['name'] ) )   $config['name'] = substr( $from, 0, strpos($from, '@'));
+            if( !isset( $config['name'] ) )   $config['name'] = substr( $config['from'], 0, strpos($config['from'], '@'));
 
 				$mail = new PHPMailer(true); // the true param means it will throw exceptions on errors, which we need to catch
 
@@ -93,7 +93,17 @@
             
             //Adiciona os destinatarios
             if( is_array( $dest ) ){
-               foreach( $dest as $a ) $mail->addAddress( $a );
+               foreach( $dest as $a ){
+                  if( is_array( $a ) ){
+                     if( isset( $a['email'] ) ){
+                        $mail->addAddress( $a['email'], $a['name'] ?? '' );
+                     } else {
+                        $mail->addAddress( reset($a), end($a) );
+                     }
+                  } else {
+                     $mail->addAddress( $a );
+                  }
+               }
             } else {
                $mail->addAddress($dest);
             }
@@ -102,7 +112,17 @@
             //Adiciona Copia
             if( isset( $config['cc'] ) ){
                if( is_array( $config['cc'] ) ){
-                  foreach( $config['cc'] as $a ) $mail->addCC( $a );
+                  foreach( $config['cc'] as $a ){
+                     if( is_array( $a ) ){
+                        if( isset( $a['email'] ) ){
+                           $mail->addCC( $a['email'], $a['name'] ?? '' );
+                        } else {
+                           $mail->addCC( reset($a), end($a) );
+                        }
+                     } else {
+                        $mail->addCC( $a );
+                     }
+                  }
                } else {
                   $mail->addCC( $config['cc'] );
                }
@@ -111,7 +131,17 @@
             //Adiciona Copia oculta
             if( isset( $config['bcc'] ) ){
                if( is_array( $config['bcc'] ) ){
-                  foreach( $config['bcc'] as $a ) $mail->addBCC( $a );
+                  foreach( $config['bcc'] as $a ){
+                     if( is_array( $a ) ){
+                        if( isset( $a['email'] ) ){
+                           $mail->addBCC( $a['email'], $a['name'] ?? '' );
+                        } else {
+                           $mail->addBCC( reset($a), end($a) );
+                        }
+                     } else {
+                        $mail->addBCC( $a );
+                     }
+                  }
                } else {
                   $mail->addBCC( $config['bcc'] );
                }
@@ -120,7 +150,7 @@
 				try {
 
                //Configura o smtp
-					$mail->SMTPDebug  = isset( $config['debug'] ) && $config['debug'] ? 2 : 0; // enables SMTP debug information (for testing)
+					$mail->SMTPDebug  = isset( $config['debug'] ) && $config['debug'] ? 4 : 0; // enables SMTP debug information (for testing)
                $mail->SMTPSecure = $config['secure'];  //"ssl";//"tls";             // sets the prefix to the servier
 					$mail->Host       = $config['host'];                               // sets GMAIL as the SMTP server
 					$mail->Port       = $config['port'];                               // set the SMTP port for the GMAIL server
@@ -130,9 +160,8 @@
 
 					$mail->Subject = $subject;
 					$mail->MsgHTML($msg);
-					$mail->Send();
-               $ret = true;
-            
+					$ret = $mail->Send();
+               
 				} catch (Exception $e) {
 					if( isset( $config['debug'] ) && $config['debug'] ){
                   throw $e;

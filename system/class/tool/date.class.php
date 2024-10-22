@@ -51,7 +51,7 @@
 			}
 		
 			
-			//Converte o formato da data para o mysql
+			//Converte o formato da data brasileira (dd/mm/yyyy) para o mysql (yyyymmdd)
 			function dateTosql( $date, $ltime = false ){
 				
 				if( empty( $date ) ){
@@ -71,7 +71,7 @@
 			}
          
          
-         //Converte o formato da data para o mysql
+         //Converte o formato da data do mysql (yyyymmdd) para o formato brasileiro (dd/mm/yyyy)
 			function sqlTodate( $date, $ltime = false ){
 				
 				if( empty( $date ) ) return;
@@ -120,8 +120,11 @@
          function htmlToDate( $date, $ltime = false ){
          
             if( empty( $date ) ) return 'NULL';
-            
-            $ret = substr($date, 8, 2) . '/' . substr($date, 5, 2) . '/' . substr($date, 0, 4);
+
+            $separator = '-';
+            if( strpos( $date, '/') > 0 ) $separator = '/';
+
+            $ret = substr($date, 8, 2) . $separator . substr($date, 5, 2) . $separator . substr($date, 0, 4);
 
             if( $ltime ) $ret .=  ' ' . substr( $date, 11, 5) . ':00';
 
@@ -133,21 +136,33 @@
          
          //Retorna uma string com o tempo decorrido (ex: 4 minutos)
          function timeElapsed($sec){
+            
+            $ret = 'Agora mesmo';
 
-            if( $sec <= 1 ) 'Agora mesmo';
+            if( $sec > 1 ){
+               
+               $date = [    'ano' => 31536000,
+                            'mes' =>  2592000,
+                            'dia' =>    86400,
+                           'hora' =>     3600,
+                         'minuto' =>       60,
+                        'segundo' =>        1];
+         
+               foreach( $date as $name => $time ){
+                  $qtde = $sec / $time;
 
-            $date = [    'ano' => 31536000,
-                         'mes' =>  2592000,
-                         'dia' =>    86400,
-                        'hora' =>     3600,
-                      'minuto' =>       60,
-                     'segundo' =>        1];
-      
-            foreach( $date as $name => $time ){
-               $qtde = $sec / $time;
-               if( $qtde >= 1 ) return 'há ' . floor( $qtde ) . ' ' . $name . ($qtde > 2 ? 's' : '');
+                  if( $qtde >= 1 ) {
+                     $ret = 'há ' . ($name == 'ano' ? 'mais de ' : '') . floor( $qtde ) . ' ' . $name;
+                     if( $qtde >= 2 ){
+                        $ret .= ($name == 'mes' ? 'es' : 's');
+                     }
+                     break;
+                  }
+               }
             }
 
+
+            return $ret;
          }
 
 		}

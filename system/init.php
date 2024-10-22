@@ -28,24 +28,31 @@
       $globals->cfg    = new Config( $absPath );
       $globals->smarty = new Smarty();
 
-      $baseURL = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL');
-      if( empty( $baseURL ) ){
-         if( PHP_SAPI === 'cli'){
-            $baseURL = 'cli://';
-
-         } else {
-            $baseURL = $_SERVER['SERVER_NAME'] . (isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '');
-            $baseURL = substr( $baseURL, 0, min(strrpos( $baseURL, '/' ), strlen( $baseURL )) );
-            if( substr( $baseURL, -1, 1 ) != '/' ) $baseURL .= '/';
-
-            $globals->cfg->setConfig(PROJECT_ID . '_ENGINE', 'BASE_URL', $baseURL);
+      //Se não tiver gerado na aplicação a URL base, gera agora.
+      if( !isset( $baseURL ) ){
+         $baseURL = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'BASE_URL');
+         if( empty( $baseURL ) ){
+            if( PHP_SAPI === 'cli'){
+               $baseURL = 'cli://';
+   
+            } else {
+               $baseURL = $_SERVER['SERVER_NAME'] . (isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '');
+               $baseURL = substr( $baseURL, 0, min(strrpos( $baseURL, '/' ), strlen( $baseURL )) );
+               if( substr( $baseURL, -1, 1 ) != '/' ) $baseURL .= '/';
+   
+               $globals->cfg->setConfig(PROJECT_ID . '_ENGINE', 'BASE_URL', $baseURL);
+            }
          }
+      } else {
+         $globals->cfg->setConfig(PROJECT_ID . '_ENGINE', 'BASE_URL', $baseURL);
       }
 
 
       //Se não tiver a url do sistema, gera agora
       //Em boa parte dos casos vai ser assim, mas talvez tenha como deixar isso mais preciso
-      if( ! isset( $systemURL ) ) $systemURL = $baseURL . 'system/';
+      if( ! isset( $systemURL ) ){
+         $systemURL = $baseURL . 'system/';
+      }
 
       //Configurações globais
       ini_set("default_socket_timeout", 60);
@@ -96,7 +103,7 @@
       $globals->environment->baseUrl          = $protocol . '://' . $baseURL;
 
       //webroot / acessivel pela url
-      $globals->environment->rootUrl          = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_URL'      , $baseURL . 'webroot/' );
+      $globals->environment->rootUrl          = $globals->environment->baseUrl . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_URL', 'webroot/' );
       $globals->environment->rootPath         = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'ROOT_DIR'      , 'webroot/');
 
       /* Core do sistema */
@@ -108,7 +115,7 @@
       $globals->environment->libPath          = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'LIB_DIR'       , 'core/lib/');
 
       /* Vendors */
-      $globals->environment->vendorUrl        = $protocol . '://' . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VENDOR_URL', $baseURL . 'vendor/' );
+      $globals->environment->vendorUrl        = $globals->environment->baseUrl . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VENDOR_URL', 'vendor/' );
       $globals->environment->vendorPath       = $absPath . $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'VENDOR_DIR', 'vendor/');
       
       /* Gojira */

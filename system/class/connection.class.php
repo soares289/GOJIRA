@@ -26,9 +26,15 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
          protected static $lastCommand;   //Ultimo comando executado
          
          protected static $database;		//Base de dados em que está conectado
-         protected static $dbHost;			   //Host atual conectado
-			protected static $dbUser;			   //Usuário que foi usado para conectar
+         protected static $dbHost;			//Host atual conectado
+			protected static $dbUser;			//Usuário que foi usado para conectar
 			protected static $dbPassword;		//Senha para a base de dados
+
+
+         //Se o PHP sofre um erro e por algum motivo fecha durante uma transação
+         //a tabela fica locada no mysql até o apache reiniciar. Para evitar isso
+         //usamos uma exit_function para rodar caso aconteça algum problema
+         protected $transaction_in_progress = false;
          
 
          //As propriedades estão ai para manter compatibilidade com sistemas antigos
@@ -204,25 +210,39 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
          //Executa uma serie de comandos sql em uma transação
          function secureExec( $sql ){
             
+            $ret = true;
+
             $this->checkConnection();
             
             if( ! is_array( $sql ) ) $sql = array( $sql );
             
+            register_shutdown_function(array($this, "__shutdown_check"));
+            
+            $this->transaction_in_progress = true;
             self::$connection->autocommit( false );
             self::$connection->begin_transaction( MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT );
                
-            foreach( $sql as $a ){
-               if( ! $this->execute( $a ) ){
-                  self::$connection->rollback(); 
-                  self::$connection->autocommit( true );
-                  return false;
+            try{
+               foreach( $sql as $a ){
+                  if( ! $this->execute( $a ) ){
+                     $ret = false;
+                     break;
+                  }
                }
+            } catch( Exception $e ){
+               $ret = false;
             }
             
-            self::$connection->commit();
-            self::$connection->autocommit( true );
+            if( $ret ){
+               self::$connection->commit();
+            } else {
+               self::$connection->rollback();
+            }
             
-            return true;
+            self::$connection->autocommit( true );
+            $this->transaction_in_progress = false;
+            
+            return $ret;
          }
 
 
@@ -398,6 +418,12 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
          }
 
          
+         //Verifica se tem alguma transaction rolando e da um rollback se precisar.
+         function __shutdown_check(){
+            if ($this->transaction_in_progress) {
+               self::$connection->rollback();
+            }
+         }
       } 
    
    
