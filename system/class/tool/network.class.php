@@ -225,7 +225,10 @@
 				
 				//Enganar o servidor, para que ele acredite que seja um usuário
 			   curl_setopt($ch, CURLOPT_HEADER, false);
-				curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
+
+            if( isset( $_SERVER['HTTP_USER_AGENT']) ){
+               curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
+            }
 				
 				//Para o caso de precisar passar informações do post atual
 				if( is_array( $sendPost ) || !empty( $sendPost ) ){

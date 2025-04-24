@@ -90,7 +90,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
             if( !$this->configured ) $this->configure( $this->userTable, $this->typeTable);
 
 				$login = $this->tools->antiInjection( $login );
-				$pwd   = $this->tools->antiInjection( $pwd );
+				// $pwd   = $this->tools->antiInjection( $pwd );
 				$type  = $this->tools->antiInjection( $type );
 				$type  = $this->getType( $type );
 
@@ -120,6 +120,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
             
 				$query = $this->connection->query( $sql );
 				$row   = $this->connection->fetch( $query );
+
 				if( strlen( $pwd ) != 128 ) $pwd = $this->toPassword( $pwd );
 
 				//Verifica se o usuário está ativo
@@ -133,7 +134,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 				}
 				
 				//Verifica se o password está correto
-				if( $pwd != $row[ 'pwd' ] ){
+				if( $pwd !== $row[ 'pwd' ] ){
 					throw( new Exception( LGN_PASS_INVALID, 0x9003 ) );
 				}
 				
