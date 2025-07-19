@@ -2,7 +2,7 @@
 
       @session_start();
 
-      define('GOJIRA_VERSION', '0.9.5');
+      define('GOJIRA_VERSION', '1.0.1');
 
       //Precisa saber a pasta do sistema que está sendo iniciado
       if( !isset( $absPath ) ) throw( new Exception('$absPath não localizado, configure a pasta base do projeto') );
@@ -22,6 +22,8 @@
       require_once( $systemPath . 'class/engine.class.php' );
       require_once( $systemPath . 'class/smarty-4.3.0/libs/Smarty.class.php' );
 
+      //Controlador das rotas do sistema
+      require_once( $systemPath . 'routes.php');
 
       //Objetos mais comumente usados
       $globals->tools  = new Tool();

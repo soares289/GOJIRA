@@ -28,7 +28,7 @@ require_once('constants.php');
 
    
    if( file_exists('routes.php') ){
-      require_once( 'routes.php' );
+      include_once( 'routes.php' );
    }
    
    require_once( $systemPath . 'init.php' );
