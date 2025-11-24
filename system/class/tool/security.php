@@ -120,6 +120,7 @@
 				
 			}
 			
+         
 			//Gera uma chave de criptografia baseado em determinada string
          function encrypt_key( $key ){
             

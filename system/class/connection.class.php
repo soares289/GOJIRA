@@ -156,7 +156,7 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
 				if( ! is_object( self::$connection ) ) return false;
 				
 				//Se for objeto, verifica se a conexão está ativa
-				return self::$connection->ping();
+				return true;
 				
 			}
 

@@ -1,0 +1,41 @@
+<?php return array(
+    'root' => array(
+        'name' => 'soares289/gojira',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => '1f82377947da7bbe3c1338fd24494bf696c9c5d6',
+        'type' => 'library',
+        'install_path' => __DIR__ . '/../../../',
+        'aliases' => array(),
+        'dev' => true,
+    ),
+    'versions' => array(
+        'smarty/smarty' => array(
+            'pretty_version' => 'v5.6.0',
+            'version' => '5.6.0.0',
+            'reference' => '1fc41e385da8a27a87bec5914392ab662a7bb8ec',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../smarty/smarty',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'soares289/gojira' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => '1f82377947da7bbe3c1338fd24494bf696c9c5d6',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/polyfill-mbstring' => array(
+            'pretty_version' => '1.x-dev',
+            'version' => '1.9999999.9999999.9999999-dev',
+            'reference' => '6d857f4d76bd4b343eac26d6b539585d2bc56493',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/polyfill-mbstring',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+    ),
+);

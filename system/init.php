@@ -2,7 +2,7 @@
 
       @session_start();
 
-      define('GOJIRA_VERSION', '1.0.1');
+      define('GOJIRA_VERSION', '1.0.2');
 
       //Precisa saber a pasta do sistema que está sendo iniciado
       if( !isset( $absPath ) ) throw( new Exception('$absPath não localizado, configure a pasta base do projeto') );
@@ -10,6 +10,7 @@
       $systemPath = str_replace( "\\", "/", __DIR__) . '/';
 
       //Classes BASE usadas por quase tudo
+      require_once( $systemPath . 'vendor/autoload.php' );
       require_once( $systemPath . 'class/gojiracore.class.php' );
       require_once( $systemPath . 'class/tool.class.php' );
       require_once( $systemPath . 'class/connection.class.php' );
@@ -20,7 +21,7 @@
       require_once( $systemPath . 'class/model.class.php' );
       require_once( $systemPath . 'class/collection.class.php' );
       require_once( $systemPath . 'class/engine.class.php' );
-      require_once( $systemPath . 'class/smarty-4.3.0/libs/Smarty.class.php' );
+      // require_once( $systemPath . '/vendor/smarty/smarty/libs/Smarty.class.php' );
 
       //Controlador das rotas do sistema
       require_once( $systemPath . 'routes.php');
@@ -28,7 +29,7 @@
       //Objetos mais comumente usados
       $globals->tools  = new Tool();
       $globals->cfg    = new Config( $absPath );
-      $globals->smarty = new Smarty();
+      $globals->smarty = new \Smarty\Smarty();
 
       //Se não tiver gerado na aplicação a URL base, gera agora.
       if( !isset( $baseURL ) ){
@@ -139,7 +140,7 @@
 
       //Configura o smarty
       $globals->smarty->setTemplateDir( $globals->environment->viewPath );
-      $globals->smarty->caching = Smarty::CACHING_OFF;
+      $globals->smarty->caching = \Smarty\Smarty::CACHING_OFF;
 
       //Adiciona o controle de helpers (autoload)
       require_once( $globals->environment->systemIncPath . 'helpers.php' );
