@@ -99,6 +99,14 @@
 		}
 
 
+		//Valida um nome de classe/componente/model para uso seguro em caminhos de arquivo.
+		//Impede path traversal (../) e inclusão de arquivos arbitrários via nome vindo da URL.
+		//Nomes válidos contêm apenas letras, números e underscore.
+		public static function isSafeName( $name ){
+			return is_string( $name ) && $name !== '' && preg_match('/^[A-Za-z0-9_]+$/', $name) === 1;
+		}
+
+
 		//Retorna o caminho absoluto atual
 		public function __absPath(){
 			return substr( __FILE__, 0, strlen( __FILE__ ) - strlen( end( explode( "/", __FILE__ ) ) ) );

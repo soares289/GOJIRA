@@ -189,6 +189,16 @@ define( 'DB_CONNECTION_INVALID_PARAMETER', 'Parametos inválidos para função %
          }
 
 
+         //Escapa um valor para uso seguro DENTRO de aspas em uma query.
+         //Deve ser usado sempre que um valor for interpolado manualmente num SQL.
+         function escape( $value ){
+
+            $this->checkConnection();
+
+            return self::$connection->real_escape_string( (string)( $value ?? '' ) );
+         }
+
+
          //Executa um comando na base de dados
          function execute( $sql ){
             

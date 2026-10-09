@@ -31,6 +31,11 @@
                $globals = $GLOBALS['globals'];
             }
 
+            //Impede path traversal / inclusão de arquivo arbitrário via nome vindo da URL
+            if( !GojiraCore::isSafeName( $class ) ){
+               throw( new ComponentException( "Invalid component name", 0x3001 ) );
+            }
+
             $file  = strtolower($class) . '.php';
             $class = ucwords(strtolower($class), "_0123456789");
 

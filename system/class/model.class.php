@@ -58,16 +58,24 @@ abstract class Model extends Connection{
 		if( $globals == '' ){
 			$globals = $GLOBALS['globals'];
 		}
-		
+
+		//Impede path traversal / inclusão de arquivo arbitrário via nome vindo da URL
+		if( !GojiraCore::isSafeName( $class ) ){
+			throw( new ModelException( "Invalid model name", 0x2001 ) );
+		}
+
 		$file    = strtolower( $class ) . '.php';
 		$dir     = $globals->environment->modelPath;
 		$class   = ucfirst($class) . '_Model';
-		
-		//Se localizar o arquivo no disco
-		if( file_exists(  $dir . $file ) ){
-			
+
+		$full = $dir . $file;
+		$real = realpath( $full );
+
+		//Se localizar o arquivo no disco (e confinado ao diretório esperado)
+		if( $real !== false && strpos( $real, realpath( $dir ) . DIRECTORY_SEPARATOR ) === 0 ){
+
 			//Instancia o objeto
-			require_once( $dir . $file );
+			require_once( $full );
 			try{
 				$objModel = new $class( $globals );
 				$objModel->onLoad();
@@ -91,13 +99,19 @@ abstract class Model extends Connection{
 		
 		$ret     = false;
 		$globals = $GLOBALS['globals'];
+
+		//Nome inválido nunca existe como model
+		if( !GojiraCore::isSafeName( $class ) ){
+			return false;
+		}
+
 		$file    = strtolower($class) . '.php';
 		$class   = ucwords(strtolower($class), "_0123456789") . '_Model';
 		$dir     = $globals->environment->modelPath;
-		
+
 		//Se localizar o arquivo no disco
 		if( file_exists(  $dir . $file ) ){
-			
+
 			require_once( $dir . $file );
 			
 			if( class_exists( $class ) ){
