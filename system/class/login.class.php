@@ -84,14 +84,17 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 			}
 			
 			
-			//Executa o login
-			function login( $login, $pwd, $type ){
+			//Executa o login.
+			//$pwd_hash = true indica que $pwd JÁ é o hash final (ex: login por chave de
+			//acesso) e deve ser comparado diretamente, sem re-hash. NUNCA derive esse
+			//flag de entrada do usuário: ele é sempre definido por código do servidor.
+			function login( $login, $pwd, $type, $pwd_hash = false ){
             
             if( !$this->configured ) $this->configure( $this->userTable, $this->typeTable);
 
-				$login = $this->tools->antiInjection( $login );
-				// $pwd   = $this->tools->antiInjection( $pwd );
-				$type  = $this->tools->antiInjection( $type );
+				//Escapa o login de forma segura (real_escape_string) antes de interpolar no SQL.
+				//Não usar antiInjection aqui: ela não escapa aspas e permite bypass de autenticação.
+				$login = $this->connection->escape( $login );
 				$type  = $this->getType( $type );
 
 				//Verifica se o usuario é valido (pelo campo login e, se useEmail, pelo campo email)
@@ -121,7 +124,10 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 				$query = $this->connection->query( $sql );
 				$row   = $this->connection->fetch( $query );
 
-				if( strlen( $pwd ) != 128 ) $pwd = $this->toPassword( $pwd );
+				//O login comum SEMPRE aplica o hash. Só pula o hash quando o chamador
+				//sinaliza explicitamente $pwd_hash (server-side). Antes, isso era inferido
+				//de strlen($pwd)==128, o que permitia pass-the-hash pelo formulário.
+				if( !$pwd_hash ) $pwd = $this->toPassword( $pwd );
 
 				//Verifica se o usuário está ativo
 				if( $row[ 'status' ] == $this->statusList['PENDING'] ){
@@ -148,7 +154,7 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
                setcookie( strtolower($row['type']) . "Name"   , $row['name'], time() + $this->cookieTime, '/');
                setcookie( strtolower($row['type']) . "Type"   , $row['type'], time() + $this->cookieTime, '/');
                setcookie( strtolower($row['type']) . "TypeCod", $row['type_cod'], time() + $this->cookieTime, '/');
-               
+
             } else {
                $_SESSION[ $row['type'] . "Logged"]  = true;
                $_SESSION[ $row['type'] . "Cod"]     = $row['code'];
@@ -311,10 +317,11 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
                         !empty( $_COOKIE[ $a . 'cod'] ) &&
                         !empty( $_COOKIE[ $a . 'login'] ) &&
                         !empty( $_COOKIE[ $a . 'email'] ) ){
-                           
-                        $typeCod = $this->getType( $a );
 
-                        if( $this->connection->exist( $this->userTable, 'id', $_COOKIE[ $a . 'Cod'], "type IN " . $typeCod . ' AND ' . $this->statusField . '=' . $this->statusList['ACTIVE'] ) ){
+                        $typeCod = $this->getType( $a );
+                        $cod     = $this->connection->escape( $_COOKIE[ $a . 'cod'] );
+
+                        if( $this->connection->exist( $this->userTable, 'id', $cod, "type IN " . $typeCod . ' AND ' . $this->statusField . '=' . $this->statusList['ACTIVE'] ) ){
                            $n++;
                         }
                      }
@@ -441,7 +448,8 @@ define( 'LGN_COOKIE_EXPIRE_TIME' , 1800);
 					
 					$type  = explode(',',$type);
 					foreach( $type as $a ){
-						$where .= (empty( $where ) ? '' : ',') . '"' . $a . '"'; 
+						$a      = $this->connection->escape( $a );
+						$where .= (empty( $where ) ? '' : ',') . '"' . $a . '"';
 					}
 					
 					$sql   = 'SELECT id AS cod, shortcode AS small FROM ' . $table .

@@ -37,15 +37,24 @@
                $globals = $GLOBALS['globals'];
             }
 
+            //Impede path traversal / inclusão de arquivo arbitrário via nome vindo da URL
+            if( !GojiraCore::isSafeName( $class ) ){
+               throw( new ControllerException( "Invalid controller name", 0x1001 ) );
+            }
+
             $file  = strtolower($class) . '.php';
             $class = ucwords(strtolower($class), "_0123456789") . '_Controller';
 				$dir   = $globals->environment->controllerPath;
 
-				//Se localizar o arquivo no disco
-				if( file_exists(  $dir . $file ) ){
+				//Confirma que o arquivo resolvido está realmente dentro do diretório de controllers
+				$full = $dir . $file;
+				$real = realpath( $full );
+
+				//Se localizar o arquivo no disco (e confinado ao diretório esperado)
+				if( $real !== false && strpos( $real, realpath( $dir ) . DIRECTORY_SEPARATOR ) === 0 ){
 
                //Instancia o objeto
-					require_once( $dir . $file );
+					require_once( $full );
                
                if( class_exists( $class ) ){
                   $objController = new $class( $globals );
@@ -112,13 +121,19 @@
             
             $ret     = false;
             $globals = $GLOBALS['globals'];
+
+            //Nome inválido nunca existe como controller
+            if( !GojiraCore::isSafeName( $class ) ){
+               return false;
+            }
+
             $file    = strtolower($class) . '.php';
             $class   = ucwords(strtolower($class), "_0123456789") . '_Controller';
 				$dir     = $globals->environment->controllerPath;
-            
+
             //Se localizar o arquivo no disco
 				if( file_exists(  $dir . $file ) ){
-               
+
                require_once( $dir . $file );
             
                if( class_exists( $class ) ){
