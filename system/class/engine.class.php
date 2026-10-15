@@ -14,11 +14,13 @@
             $objData = Controller::Call( $class, $proc, $param, $globals );
 
             //Retorna o view
-            $template_ext = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'TEMPLATE_EXTENSION', '.html');
+            $template_ext = $globals->cfg->getConfig( PROJECT_ID . '_ENGINE', 'TEMPLATE_EXTENSION', '.tpl,.html');
+            $template_ext = explode(',', $template_ext);
+
             if( isset( $objData->view_file ) ){
-               $file = $objData->view_file . $template_ext;
+               $file = $objData->view_file;
             } else {
-               $file = $class . '/' . $proc . $template_ext;
+               $file = $class . '/' . $proc;
             }
 
             //Passa as variaveis para o template
@@ -36,9 +38,19 @@
             }
 
 
+            //Aceita mais de uma extensão de arquivo
+            $view_file = '';
+            foreach( $template_ext as $ext ){
+               if( file_exists( $globals->environment->viewPath . $file . $ext ) ){
+                  $view_file = $globals->environment->viewPath . $file . $ext;
+                  break;
+               }
+            }
+
+
             //Renderiza o view
-            if( file_exists( $globals->environment->viewPath . $file ) ){
-               return $globals->smarty->fetch( $file );
+            if( !empty( $view_file ) ){
+               return $globals->smarty->fetch( $view_file );
             } elseif( is_object($objData) || is_array($objData) ){
                return json_encode( $objData );
             } elseif( !is_object( $objData ) ){
